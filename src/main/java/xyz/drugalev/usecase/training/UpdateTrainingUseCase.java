@@ -24,10 +24,10 @@ public class UpdateTrainingUseCase {
     /**
      * Update training.
      *
-     * @param training training to update.
-     * @param duration new training duration.
+     * @param training       training to update.
+     * @param duration       new training duration.
      * @param burnedCalories new training burned calories.
-     * @throws NegativeArgumentException  if duration or burned calories less than 0.
+     * @throws NegativeArgumentException if duration or burned calories less than 0.
      */
     public void update(Training training, int duration, int burnedCalories) throws NegativeArgumentException {
         if (duration < 0) {

@@ -18,7 +18,7 @@ public interface UserService {
      *
      * @param user user to save.
      * @return saved user.
-     * @throws ValidationException if given invalid user data.
+     * @throws ValidationException        if given invalid user data.
      * @throws UserAlreadyExistsException if user already exists.
      */
     User save(User user) throws ValidationException, UserAlreadyExistsException;

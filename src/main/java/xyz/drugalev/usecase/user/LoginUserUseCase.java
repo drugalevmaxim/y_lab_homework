@@ -20,10 +20,11 @@ public class LoginUserUseCase {
     public LoginUserUseCase(UserService userService) {
         this.userService = userService;
     }
+
     public User login(String username, String password) throws UserNotFoundException {
         Optional<User> user = userService.findUser(username);
 
-        if (user.isEmpty() || !user.get().getPassword().equals(password))  {
+        if (user.isEmpty() || !user.get().getPassword().equals(password)) {
             throw new UserNotFoundException(username);
         }
 

@@ -80,7 +80,7 @@ public class InputUtil {
     public String getPassword() {
         System.out.print(PROMPT);
         if (System.console() != null) {
-           return String.valueOf(System.console().readPassword());
+            return String.valueOf(System.console().readPassword());
         }
         return getLine();
     }

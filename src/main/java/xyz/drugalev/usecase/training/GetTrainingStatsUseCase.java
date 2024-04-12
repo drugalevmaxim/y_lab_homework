@@ -26,9 +26,9 @@ public class GetTrainingStatsUseCase {
     /**
      * Returns sum of trainings duration at given period.
      *
-     * @param user user who performed training.
+     * @param user  user who performed training.
      * @param start starting date.
-     * @param end ending date.
+     * @param end   ending date.
      * @return sum of trainings duration at given period.
      * @throws IllegalDatePeriodException if start > end.
      */
@@ -42,9 +42,9 @@ public class GetTrainingStatsUseCase {
     /**
      * Returns sum of trainings burned calories at given period.
      *
-     * @param user user who performed training.
+     * @param user  user who performed training.
      * @param start starting date.
-     * @param end ending date.
+     * @param end   ending date.
      * @return sum of trainings duration at given period.
      * @throws IllegalDatePeriodException if start > end.
      */

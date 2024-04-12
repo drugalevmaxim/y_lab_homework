@@ -2,6 +2,7 @@ package xyz.drugalev.domain.entity;
 
 /**
  * List of privileges.
+ *
  * @author Drugalev Maxim
  */
 public enum Privilege {

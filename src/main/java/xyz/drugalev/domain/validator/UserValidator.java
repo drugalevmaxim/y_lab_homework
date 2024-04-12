@@ -10,6 +10,7 @@ public class UserValidator {
 
     /**
      * Checks if given name is valid.
+     *
      * @param name name to validate.
      * @return true if name is valid, false otherwise.
      */
@@ -19,6 +20,7 @@ public class UserValidator {
 
     /**
      * Checks if given password is valid.
+     *
      * @param password password to validate.
      * @return true if password is valid, false otherwise.
      */
@@ -28,6 +30,7 @@ public class UserValidator {
 
     /**
      * Get description of validator.
+     *
      * @return description of validator.
      */
     public String getDescription() {

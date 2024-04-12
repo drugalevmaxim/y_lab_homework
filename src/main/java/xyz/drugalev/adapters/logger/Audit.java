@@ -13,10 +13,12 @@ public class Audit {
     private static Audit _instance;
     private final List<String> records = new ArrayList<>();
 
-    private Audit() {}
+    private Audit() {
+    }
 
     /**
      * Get audit instance.
+     *
      * @return audit instance.
      */
     public static Audit getInstance() {
@@ -28,6 +30,7 @@ public class Audit {
 
     /**
      * Log action in audit.
+     *
      * @param action action to log.
      */
     public void log(String action) {

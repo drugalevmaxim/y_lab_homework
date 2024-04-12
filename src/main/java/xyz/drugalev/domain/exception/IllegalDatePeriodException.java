@@ -5,7 +5,6 @@ package xyz.drugalev.domain.exception;
  * i.e. start date > end date.
  */
 public class IllegalDatePeriodException extends Exception {
-
     /**
      * Default constructor.
      *

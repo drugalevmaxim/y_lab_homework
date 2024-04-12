@@ -19,6 +19,7 @@ public class User {
 
     /**
      * Default constructor.
+     *
      * @param username user name.
      * @param password user password.
      */
@@ -30,6 +31,7 @@ public class User {
 
     /**
      * Checks if user has given privilege.
+     *
      * @param privilege privilege to check.
      * @return true if user has privilege, false otherwise.
      */

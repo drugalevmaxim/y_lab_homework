@@ -24,10 +24,10 @@ public class AddTrainingDataUseCase {
     /**
      * Add training data to training
      *
-     * @param training training to which training data will be added
+     * @param training     training to which training data will be added
      * @param trainingData training data to add;
      */
-    public void addTrainingData(Training training, TrainingData trainingData)  {
+    public void addTrainingData(Training training, TrainingData trainingData) {
         training.getTrainingData().add(trainingData);
     }
 }

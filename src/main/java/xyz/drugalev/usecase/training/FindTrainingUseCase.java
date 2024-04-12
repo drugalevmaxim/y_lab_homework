@@ -1,7 +1,7 @@
 package xyz.drugalev.usecase.training;
 
-import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.entity.Training;
+import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.exception.IllegalDatePeriodException;
 import xyz.drugalev.domain.service.TrainingService;
 
@@ -47,9 +47,9 @@ public class FindTrainingUseCase {
     /**
      * Returns list of all users trainings performed between given dates.
      *
-     * @param user user who performed training.
+     * @param user  user who performed training.
      * @param start starting date.
-     * @param end ending date.
+     * @param end   ending date.
      * @return list of all trainings.
      * @throws IllegalDatePeriodException if start > end
      */

@@ -4,7 +4,6 @@ package xyz.drugalev.domain.exception;
  * Exception thrown when given int expected to be positive, but negative is given.
  */
 public class NegativeArgumentException extends Exception {
-
     /**
      * Default constructor.
      *

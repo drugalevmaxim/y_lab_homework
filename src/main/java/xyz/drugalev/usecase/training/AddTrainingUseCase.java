@@ -31,14 +31,14 @@ public class AddTrainingUseCase {
     /**
      * Add training
      *
-     * @param user user which performed trainings.
-     * @param date date when training that was performed.
-     * @param TrainingType type of training that was performed.
-     * @param duration duration of training.
+     * @param user           user which performed trainings.
+     * @param date           date when training that was performed.
+     * @param TrainingType   type of training that was performed.
+     * @param duration       duration of training.
      * @param burnedCalories burned calories while training.
      * @return added training.
-     * @throws NegativeArgumentException if duration or burned calories less than 0.
-     * @throws IllegalDatePeriodException if date > today.
+     * @throws NegativeArgumentException      if duration or burned calories less than 0.
+     * @throws IllegalDatePeriodException     if date > today.
      * @throws TrainingAlreadyExistsException if training already exists.
      */
     public Training add(User user, LocalDate date, TrainingType TrainingType, int duration, int burnedCalories) throws TrainingAlreadyExistsException, IllegalDatePeriodException, NegativeArgumentException {

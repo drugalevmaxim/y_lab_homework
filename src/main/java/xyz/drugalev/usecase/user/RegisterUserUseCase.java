@@ -24,11 +24,12 @@ public class RegisterUserUseCase {
 
     /**
      * Register user.
+     *
      * @param username username of user to register.
      * @param password password of user to register.
      * @return registered user.
      * @throws UserAlreadyExistsException if user with given username already exists.
-     * @throws ValidationException if passed username/password is invalid.
+     * @throws ValidationException        if passed username/password is invalid.
      */
     public User register(String username, String password) throws UserAlreadyExistsException, ValidationException {
         return userService.save(new User(username, password));

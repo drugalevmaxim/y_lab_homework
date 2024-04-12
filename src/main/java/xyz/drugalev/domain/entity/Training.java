@@ -26,10 +26,10 @@ public class Training {
     /**
      * Default constructor
      *
-     * @param performer user which performed training.
-     * @param date date when training was performed.
-     * @param trainingType type of training.
-     * @param duration duration of training.
+     * @param performer      user which performed training.
+     * @param date           date when training was performed.
+     * @param trainingType   type of training.
+     * @param duration       duration of training.
      * @param burnedCalories burned calories during training.
      */
     public Training(User performer, LocalDate date, TrainingType trainingType, int duration, int burnedCalories) {

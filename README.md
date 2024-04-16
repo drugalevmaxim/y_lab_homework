@@ -14,6 +14,6 @@ A workout diary app that lets you record your workouts, review them, and analyze
    ```
 3. Run the project by running the following command:
     ```bash
-    java -jar target/ylab-trainingType-diary-1.0-SNAPSHOT.jar
+    java -jar target/ylab-training-diary-1.0-SNAPSHOT.jar
     ```
 # Completed tasks

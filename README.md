@@ -10,7 +10,7 @@ A workout diary app that lets you record your workouts, review them, and analyze
 
 - JDK 17
 - Maven
-- 
+
 # Build and run
 
 1. Clone the repository by running the following command:
@@ -26,5 +26,6 @@ A workout diary app that lets you record your workouts, review them, and analyze
     java -jar target/ylab-training-diary-1.0-SNAPSHOT.jar
     ```
 
-
 # Completed tasks
+
+1. [Task 1](../../pull/1/)

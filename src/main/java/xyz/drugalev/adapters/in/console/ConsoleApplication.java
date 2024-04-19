@@ -3,14 +3,29 @@ package xyz.drugalev.adapters.in.console;
 import xyz.drugalev.adapters.in.console.menu.Menu;
 import xyz.drugalev.adapters.in.console.menu.MenuItem;
 import xyz.drugalev.adapters.logger.Audit;
-import xyz.drugalev.domain.entity.*;
+import xyz.drugalev.adapters.logger.AuditRecord;
+import xyz.drugalev.domain.entity.Privilege;
+import xyz.drugalev.domain.entity.Training;
+import xyz.drugalev.domain.entity.TrainingData;
+import xyz.drugalev.domain.entity.TrainingType;
+import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.exception.IllegalDatePeriodException;
-import xyz.drugalev.domain.repository.TrainingRepositoryImpl;
-import xyz.drugalev.domain.repository.TrainingTypeRepositoryImpl;
-import xyz.drugalev.domain.repository.UserRepositoryImpl;
-import xyz.drugalev.domain.service.*;
+import xyz.drugalev.domain.repository.impl.TrainingRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.TrainingTypeRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.UserRepositoryImpl;
+import xyz.drugalev.domain.service.TrainingService;
+import xyz.drugalev.domain.service.TrainingTypeService;
+import xyz.drugalev.domain.service.UserService;
+import xyz.drugalev.domain.service.impl.TrainingServiceImpl;
+import xyz.drugalev.domain.service.impl.TrainingTypeServiceImpl;
+import xyz.drugalev.domain.service.impl.UserServiceImpl;
 import xyz.drugalev.domain.validator.UserValidator;
-import xyz.drugalev.usecase.training.*;
+import xyz.drugalev.usecase.training.AddTrainingDataUseCase;
+import xyz.drugalev.usecase.training.AddTrainingUseCase;
+import xyz.drugalev.usecase.training.DeleteTrainingUseCase;
+import xyz.drugalev.usecase.training.FindTrainingUseCase;
+import xyz.drugalev.usecase.training.GetTrainingStatsUseCase;
+import xyz.drugalev.usecase.training.UpdateTrainingUseCase;
 import xyz.drugalev.usecase.trainingtype.AddTrainingTypeUseCase;
 import xyz.drugalev.usecase.trainingtype.FindTrainingTypeUseCase;
 import xyz.drugalev.usecase.user.LoginUserUseCase;
@@ -18,6 +33,7 @@ import xyz.drugalev.usecase.user.RegisterUserUseCase;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -70,7 +86,7 @@ public class ConsoleApplication {
 
         try {
             currentUser = useCase.login(username, password);
-            Audit.getInstance().log("User " + username + "  logged in");
+            Audit.getInstance().log(currentUser, "logging in");
             userScreen();
         } catch (Exception e) {
             System.err.println("Couldn't login: " + e.getMessage());
@@ -87,7 +103,7 @@ public class ConsoleApplication {
 
         try {
             currentUser = useCase.register(username, password);
-            Audit.getInstance().log("User " + username + " registered");
+            Audit.getInstance().log(currentUser, "registration");
             userScreen();
         } catch (Exception e) {
             System.err.println("Couldn't register: " + e.getMessage());
@@ -176,7 +192,7 @@ public class ConsoleApplication {
             AddTrainingUseCase addTrainingUseCase = new AddTrainingUseCase(trainingService);
             addTrainingUseCase.add(currentUser, LocalDate.now(), selectedType, duration, burnedCalories);
 
-            Audit.getInstance().log("User " + currentUser.getUsername() + " added training");
+            Audit.getInstance().log(currentUser, "adding training");
 
         } catch (Exception e) {
             System.err.println("Unable to add training: " + e.getMessage());
@@ -186,7 +202,7 @@ public class ConsoleApplication {
     private void getAllUserTrainingsScreen() {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
         List<Training> trainings = useCase.findAllByUser(currentUser);
-        Audit.getInstance().log("User " + currentUser.getUsername() + " requested all his trainings");
+        Audit.getInstance().log(currentUser, "requesting all his trainings");
         viewTrainingsScreen(trainings);
     }
 
@@ -196,7 +212,7 @@ public class ConsoleApplication {
         LocalDate end = inputUtil.getLocalDate();
         try {
             List<Training> trainings = useCase.findBetween(currentUser, start, end);
-            Audit.getInstance().log("User " + currentUser.getUsername() + " requested all his trainings in period");
+            Audit.getInstance().log(currentUser, "requesting all his trainings in period");
             viewTrainingsScreen(trainings);
         } catch (IllegalDatePeriodException e) {
             System.err.println("Unable to get trainings: " + e.getMessage());
@@ -219,7 +235,7 @@ public class ConsoleApplication {
 
         Training selectedTraining = trainings.get(Integer.parseInt(userPick));
 
-        Audit.getInstance().log("User " + currentUser.getUsername() + " requested training details");
+        Audit.getInstance().log(currentUser, "requesting training details");
         viewTrainingScreen(selectedTraining);
     }
 
@@ -253,9 +269,7 @@ public class ConsoleApplication {
                     return;
                 }
             }
-
         }
-
     }
 
     private void addTrainingDataScreen(Training training) {
@@ -266,7 +280,7 @@ public class ConsoleApplication {
 
         AddTrainingDataUseCase useCase = new AddTrainingDataUseCase(trainingService);
         useCase.addTrainingData(training, new TrainingData(name, value));
-        Audit.getInstance().log("User " + currentUser.getUsername() + " added training data to training");
+        Audit.getInstance().log(currentUser, "adding training data to training");
     }
 
     private void editTrainingScreen(Training training) {
@@ -278,7 +292,7 @@ public class ConsoleApplication {
 
             UpdateTrainingUseCase updateTrainingUseCase = new UpdateTrainingUseCase(trainingService);
             updateTrainingUseCase.update(training, duration, burnedCalories);
-            Audit.getInstance().log("User " + currentUser.getUsername() + " updated training");
+            Audit.getInstance().log(currentUser, "updating training");
         } catch (Exception e) {
             System.err.println("Couldn't edit training: " + e.getMessage());
         }
@@ -288,7 +302,7 @@ public class ConsoleApplication {
         try {
             DeleteTrainingUseCase useCase = new DeleteTrainingUseCase(trainingService);
             useCase.delete(training);
-            Audit.getInstance().log("User " + currentUser.getUsername() + " deleted training");
+            Audit.getInstance().log(currentUser, "deleting training");
         } catch (Exception e) {
             System.err.println("Couldn't edit training: " + e.getMessage());
         }
@@ -300,13 +314,12 @@ public class ConsoleApplication {
         LocalDate end = inputUtil.getLocalDate();
 
         try {
-            int duration = useCase.getTrainingsDuration(currentUser, start, end);
-            int burnedCalories = useCase.getTrainingsBurnedCalories(currentUser, start, end);
+            Map<String, Integer> stats = useCase.getTrainingsStats(currentUser, start, end);
 
             System.out.printf("In %d days you trained %d min and burned %d cal\n",
-                    DAYS.between(start, end) + 1, duration, burnedCalories);
+                    DAYS.between(start, end) + 1, stats.get("Duration"), stats.get("Calories"));
 
-            Audit.getInstance().log("User " + currentUser.getUsername() + " requested training stats in period");
+            Audit.getInstance().log(currentUser, "requesting training stats in period");
         } catch (IllegalDatePeriodException e) {
             System.err.println("Couldn't load stats for given period: " + e.getMessage());
         }
@@ -317,18 +330,18 @@ public class ConsoleApplication {
         String trainingTypeName = inputUtil.getLine();
         AddTrainingTypeUseCase trainingTypeUseCase = new AddTrainingTypeUseCase(trainingTypeService);
         trainingTypeUseCase.add(trainingTypeName);
-        Audit.getInstance().log("User " + currentUser.getUsername() + " added training type");
+        Audit.getInstance().log(currentUser, "adding training type");
     }
 
     private void getOtherUsersTrainingsScreen() {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
         List<Training> trainings = useCase.findAll();
-        Audit.getInstance().log("User " + currentUser.getUsername() + " requested all trainings");
+        Audit.getInstance().log(currentUser, "requesting all trainings");
         viewTrainingsScreen(trainings);
     }
 
     private void auditLogScreen() {
-        for (String auditRecord : Audit.getInstance().getAuditRecords()) {
+        for (AuditRecord auditRecord : Audit.getInstance().getAuditRecords()) {
             System.out.println(auditRecord);
         }
     }

@@ -9,6 +9,7 @@ import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -53,28 +54,16 @@ public interface TrainingService {
      */
     List<Training> findByUserBetweenDates(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
 
-
     /**
-     * Returns sum of duration of all trainings user performed between given dates.
+     * Returns training stats in Map with "Duration" and "Calories" keys
      *
-     * @param user  user which performed trainings.
-     * @param start min date of performed trainings.
-     * @param end   max date of performed trainings.
-     * @return duration sum.
+     * @param user  user who performed training.
+     * @param start starting date.
+     * @param end   ending date.
+     * @return Map with "Duration" and "Calories" keys.
      * @throws IllegalDatePeriodException if start > end.
      */
-    int getTrainingsDuration(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
-
-    /**
-     * Returns sum of burned calories of all trainings user performed between given dates.
-     *
-     * @param user  user which performed trainings.
-     * @param start min date of performed trainings.
-     * @param end   max date of performed trainings.
-     * @return duration sum.
-     * @throws IllegalDatePeriodException if start > end.
-     */
-    int getTrainingsBurnedCalories(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
+    Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
 
     /**
      * Saves a given training to repository.

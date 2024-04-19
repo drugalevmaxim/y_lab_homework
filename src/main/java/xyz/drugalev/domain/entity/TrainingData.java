@@ -1,6 +1,7 @@
 package xyz.drugalev.domain.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 /**
@@ -8,11 +9,11 @@ import lombok.Getter;
  *
  * @author Drugalev Maxim
  */
+@Data
 @AllArgsConstructor
-@Getter
 public class TrainingData {
-    private String name;
-    private int value;
+    private final String name;
+    private final int value;
 
     /**
      * Represents training data as string.

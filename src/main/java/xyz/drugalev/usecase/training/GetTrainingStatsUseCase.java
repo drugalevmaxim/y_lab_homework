@@ -5,6 +5,7 @@ import xyz.drugalev.domain.exception.IllegalDatePeriodException;
 import xyz.drugalev.domain.service.TrainingService;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 /**
  * Use case for getting training stats.
@@ -24,35 +25,19 @@ public class GetTrainingStatsUseCase {
     }
 
     /**
-     * Returns sum of trainings duration at given period.
+     * Returns training stats in Map with "Duration" and "Calories" keys
      *
      * @param user  user who performed training.
      * @param start starting date.
      * @param end   ending date.
-     * @return sum of trainings duration at given period.
+     * @return Map with "Duration" and "Calories" keys.
      * @throws IllegalDatePeriodException if start > end.
      */
-    public int getTrainingsDuration(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
+    public Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
         if (start.isAfter(end)) {
             throw new IllegalDatePeriodException("Start date is later than end date. ");
         }
-        return trainingService.getTrainingsDuration(user, start, end);
-    }
-
-    /**
-     * Returns sum of trainings burned calories at given period.
-     *
-     * @param user  user who performed training.
-     * @param start starting date.
-     * @param end   ending date.
-     * @return sum of trainings duration at given period.
-     * @throws IllegalDatePeriodException if start > end.
-     */
-    public int getTrainingsBurnedCalories(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
-        if (start.isAfter(end)) {
-            throw new IllegalDatePeriodException("Start date is later than end date. ");
-        }
-        return trainingService.getTrainingsBurnedCalories(user, start, end);
+        return trainingService.getTrainingsStats(user, start, end);
     }
 
 }

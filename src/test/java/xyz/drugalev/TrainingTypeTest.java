@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import xyz.drugalev.domain.entity.TrainingType;
-import xyz.drugalev.domain.repository.TrainingTypeRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.TrainingTypeRepositoryImpl;
 import xyz.drugalev.domain.service.TrainingTypeService;
-import xyz.drugalev.domain.service.TrainingTypeServiceImpl;
+import xyz.drugalev.domain.service.impl.TrainingTypeServiceImpl;
 import xyz.drugalev.usecase.trainingtype.AddTrainingTypeUseCase;
 import xyz.drugalev.usecase.trainingtype.FindTrainingTypeUseCase;
 

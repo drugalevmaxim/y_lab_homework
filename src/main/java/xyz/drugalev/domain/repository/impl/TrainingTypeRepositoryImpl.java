@@ -1,6 +1,8 @@
-package xyz.drugalev.domain.repository;
+package xyz.drugalev.domain.repository.impl;
 
+import lombok.NonNull;
 import xyz.drugalev.domain.entity.TrainingType;
+import xyz.drugalev.domain.repository.TrainingTypeRepository;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,7 +24,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     }
 
     @Override
-    public TrainingType save(TrainingType TrainingType) {
+    public TrainingType save(@NonNull TrainingType TrainingType) {
         trainingTypes.add(TrainingType);
         return TrainingType;
     }

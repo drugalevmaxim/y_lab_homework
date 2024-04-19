@@ -1,7 +1,8 @@
-package xyz.drugalev.domain.service;
+package xyz.drugalev.domain.service.impl;
 
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.repository.TrainingTypeRepository;
+import xyz.drugalev.domain.service.TrainingTypeService;
 
 import java.util.List;
 
@@ -18,8 +19,9 @@ public class TrainingTypeServiceImpl implements TrainingTypeService {
     }
 
     @Override
-    public TrainingType save(TrainingType TrainingType) {
-        return TrainingTypeRepository.save(TrainingType);
+    public TrainingType save(TrainingType trainingType) {
+
+        return TrainingTypeRepository.save(trainingType);
     }
 
 }

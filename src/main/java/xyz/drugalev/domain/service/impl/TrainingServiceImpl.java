@@ -1,4 +1,4 @@
-package xyz.drugalev.domain.service;
+package xyz.drugalev.domain.service.impl;
 
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.TrainingType;
@@ -6,9 +6,12 @@ import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.exception.IllegalDatePeriodException;
 import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
 import xyz.drugalev.domain.repository.TrainingRepository;
+import xyz.drugalev.domain.service.TrainingService;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class TrainingServiceImpl implements TrainingService {
@@ -38,14 +41,17 @@ public class TrainingServiceImpl implements TrainingService {
         return trainingRepository.findByUserBetweenDates(user, start, end);
     }
 
-    @Override
-    public int getTrainingsDuration(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
-        return trainingRepository.findByUserBetweenDates(user, start, end).stream().mapToInt(Training::getDuration).sum();
-    }
-
-    @Override
-    public int getTrainingsBurnedCalories(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
-        return trainingRepository.findByUserBetweenDates(user, start, end).stream().mapToInt(Training::getBurnedCalories).sum();
+    public Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
+        Map<String, Integer> stats = new HashMap<>();
+        int dur = 0;
+        int cal = 0;
+        for (Training training : trainingRepository.findByUserBetweenDates(user, start, end)) {
+            dur += training.getDuration();
+            cal += training.getBurnedCalories();
+        }
+        stats.put("Duration", dur);
+        stats.put("Calories", cal);
+        return stats;
     }
 
     @Override

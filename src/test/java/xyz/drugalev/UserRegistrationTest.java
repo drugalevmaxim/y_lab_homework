@@ -5,9 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import xyz.drugalev.domain.exception.UserAlreadyExistsException;
 import xyz.drugalev.domain.exception.ValidationException;
-import xyz.drugalev.domain.repository.UserRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.UserRepositoryImpl;
 import xyz.drugalev.domain.service.UserService;
-import xyz.drugalev.domain.service.UserServiceImpl;
+import xyz.drugalev.domain.service.impl.UserServiceImpl;
 import xyz.drugalev.domain.validator.UserValidator;
 import xyz.drugalev.usecase.user.RegisterUserUseCase;
 

@@ -1,9 +1,10 @@
-package xyz.drugalev.domain.service;
+package xyz.drugalev.domain.service.impl;
 
 import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.exception.UserAlreadyExistsException;
 import xyz.drugalev.domain.exception.ValidationException;
 import xyz.drugalev.domain.repository.UserRepository;
+import xyz.drugalev.domain.service.UserService;
 import xyz.drugalev.domain.validator.UserValidator;
 
 import java.util.Optional;

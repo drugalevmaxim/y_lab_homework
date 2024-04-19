@@ -1,5 +1,7 @@
 package xyz.drugalev.adapters.logger;
 
+import xyz.drugalev.domain.entity.User;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public class Audit {
     private static Audit _instance;
-    private final List<String> records = new ArrayList<>();
+    private final List<AuditRecord> records = new ArrayList<>();
 
     private Audit() {
     }
@@ -33,16 +35,14 @@ public class Audit {
      *
      * @param action action to log.
      */
-    public void log(String action) {
-        LocalDateTime timestamp = LocalDateTime.now();
-        String record = timestamp + " : " + action;
-        records.add(record);
+    public void log(User user, String action) {
+        records.add(new AuditRecord(user, LocalDateTime.now(), action));
     }
 
     /**
      * Get actions log from audit.
      */
-    public List<String> getAuditRecords() {
+    public List<AuditRecord> getAuditRecords() {
         return records;
     }
 }

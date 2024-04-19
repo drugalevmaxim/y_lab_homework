@@ -1,7 +1,7 @@
 package xyz.drugalev.domain.entity;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,34 +12,15 @@ import java.util.List;
  *
  * @author Drugalev Maxim
  */
-@Getter
+@Data
+@AllArgsConstructor
 public class Training {
     private final User performer;
     private final LocalDate date;
     private final TrainingType trainingType;
-    private final List<TrainingData> trainingData;
-    @Setter
+    private final List<TrainingData> trainingData  = new ArrayList<>();
     private int duration;
-    @Setter
     private int burnedCalories;
-
-    /**
-     * Default constructor
-     *
-     * @param performer      user which performed training.
-     * @param date           date when training was performed.
-     * @param trainingType   type of training.
-     * @param duration       duration of training.
-     * @param burnedCalories burned calories during training.
-     */
-    public Training(User performer, LocalDate date, TrainingType trainingType, int duration, int burnedCalories) {
-        this.performer = performer;
-        this.date = date;
-        this.trainingType = trainingType;
-        this.duration = duration;
-        this.burnedCalories = burnedCalories;
-        trainingData = new ArrayList<>();
-    }
 
     /**
      * Represents training as string.

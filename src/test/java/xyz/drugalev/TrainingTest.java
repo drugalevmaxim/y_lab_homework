@@ -1,6 +1,5 @@
 package xyz.drugalev;
 
-
 import org.junit.jupiter.api.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -26,6 +25,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static xyz.drugalev.config.JDBCConnectionProvider.setConnectionCredentials;
 
@@ -35,24 +35,32 @@ public class TrainingTest {
     @Container
     private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:alpine");
 
-    private static UserRepository userRepository;
     private static TrainingService trainingService;
     private static TrainingTypeService trainingTypeService;
     private static User mockUser1;
     private static User mockUser2;
+
     @BeforeAll
     public static void setUp() throws SQLException {
         container.start();
-        setConnectionCredentials(container.getJdbcUrl(),container.getUsername(), container.getPassword());
+        setConnectionCredentials(container.getJdbcUrl(), container.getUsername(), container.getPassword());
         MigrationLoader.migrate();
         TrainingTypeRepository trainingTypeRepository = new TrainingTypeRepositoryImpl();
-        userRepository = new UserRepositoryImpl(new RoleRepositoryImpl(new PrivilegeRepositoryImpl()));
+        UserRepository userRepository = new UserRepositoryImpl(new RoleRepositoryImpl(new PrivilegeRepositoryImpl()));
         trainingTypeService = new TrainingTypeServiceImpl(trainingTypeRepository);
         trainingService = new TrainingServiceImpl(new TrainingRepositoryImpl(trainingTypeRepository, new TrainingDataRepositoryImpl(), userRepository));
         userRepository.save("test_1", "test_1");
         userRepository.save("test_2", "test_2");
-        mockUser1 = userRepository.find("test_1").get();
-        mockUser2 = userRepository.find("test_2").get();
+
+        Optional<User> mockUser1Optional = userRepository.find("test_1");
+        Optional<User> mockUser2Optional = userRepository.find("test_2");
+
+        if (mockUser1Optional.isEmpty() || mockUser2Optional.isEmpty()) {
+            Assertions.fail();
+        }
+
+        mockUser1 = mockUser1Optional.get();
+        mockUser2 = mockUser2Optional.get();
     }
 
     @Test
@@ -78,55 +86,89 @@ public class TrainingTest {
     @Order(3)
     public void addTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 10, 10);
-        Assertions.assertTrue(trainingService.find(mockUser1, LocalDate.now(),  trainingTypeService.find("Training").get()).isPresent());
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
+        useCase.add(mockUser1, LocalDate.now(), trainingTypeOptional.get(), 10, 10);
+        Assertions.assertTrue(trainingService.find(mockUser1, LocalDate.now(), trainingTypeOptional.get()).isPresent());
     }
 
     @Test
     @Order(4)
     public void addExistingTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-       Assertions.assertThrows(SQLException.class, () ->
-                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 10, 10));
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
+        Assertions.assertThrows(SQLException.class, () ->
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeOptional.get(), 10, 10));
     }
 
     @Test
     @Order(5)
-    public void addTrainingWithFutureData() {
+    public void addTrainingWithFutureData() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
         Assertions.assertThrows(IllegalDateException.class, () ->
-                useCase.add(mockUser1, LocalDate.now().plusDays(1), trainingTypeService.find("Training").get(), 10, 10));
+                useCase.add(mockUser1, LocalDate.now().plusDays(1), trainingTypeOptional.get(), 10, 10));
     }
 
     @Test
     @Order(6)
-    public void addTrainingWithNegativeDuration() {
+    public void addTrainingWithNegativeDuration() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), -1, 1));
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeOptional.get(), -1, 1));
     }
 
     @Test
     @Order(7)
-    public void addTrainingWithNegativeBurnedCalories() {
+    public void addTrainingWithNegativeBurnedCalories() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 1, -1));
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeOptional.get(), 1, -1));
     }
 
     @Test
     @Order(8)
     public void isTrainingsSorted() throws NegativeArgumentException, SQLException, IllegalDateException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        TrainingType tt = trainingTypeService.find("Training").get();
 
-        useCase.add(mockUser1, LocalDate.now().minusDays(2), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(1), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(3), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(6), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(4), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(5), tt, 0, 0);
-        useCase.add(mockUser1, LocalDate.now().minusDays(7), tt, 0, 0);
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
+        useCase.add(mockUser1, LocalDate.now().minusDays(2), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(1), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(3), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(6), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(4), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(5), trainingTypeOptional.get(), 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(7), trainingTypeOptional.get(), 0, 0);
 
         FindTrainingUseCase findUseCase = new FindTrainingUseCase(trainingService);
         List<Training> trainings = findUseCase.findAllByUser(mockUser1);
@@ -152,8 +194,14 @@ public class TrainingTest {
     @Order(10)
     public void findUserTrainings() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
         for (int i = 0; i < 5; i++) {
-            trainingService.save(mockUser2, LocalDate.now().minusDays(i), trainingTypeService.find("Training").get(), 1, 2);
+            trainingService.save(mockUser2, LocalDate.now().minusDays(i), trainingTypeOptional.get(), 1, 2);
         }
         Assertions.assertEquals(useCase.findAllByUser(mockUser2).size(), 5);
     }
@@ -182,8 +230,14 @@ public class TrainingTest {
     @Order(13)
     public void deleteTraining() throws Exception {
         DeleteTrainingUseCase useCase = new DeleteTrainingUseCase(trainingService);
-        useCase.delete(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeService.find("Training").get()).get());
-        Assertions.assertTrue(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeService.find("Training").get()).isEmpty());
+
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
+        useCase.delete(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeOptional.get()).get());
+        Assertions.assertTrue(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeOptional.get()).isEmpty());
     }
 
     @Test
@@ -192,9 +246,17 @@ public class TrainingTest {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
         GetTrainingStatsUseCase getStatsUseCase = new GetTrainingStatsUseCase(trainingService);
 
-        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
 
-        useCase.update(t, 100, 100);
+        Optional<Training> trainingOptional = trainingService.find(mockUser2, LocalDate.now(), trainingTypeOptional.get());
+        if (trainingOptional.isEmpty()) {
+            Assertions.fail("No training");
+        }
+
+        useCase.update(trainingOptional.get(), 100, 100);
 
         Map<String, Integer> stats = getStatsUseCase.getTrainingsStats(mockUser2, LocalDate.now(), LocalDate.now());
         Assertions.assertEquals(100, stats.get("Duration"));
@@ -206,10 +268,18 @@ public class TrainingTest {
     public void unsuccessfulUpdateTrainings() throws SQLException {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
 
-        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
+
+        Optional<Training> trainingOptional = trainingService.find(mockUser2, LocalDate.now(), trainingTypeOptional.get());
+        if (trainingOptional.isEmpty()) {
+            Assertions.fail("No training");
+        }
 
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.update(t, -100, -100)
+                useCase.update(trainingOptional.get(), -100, -100)
         );
     }
 
@@ -218,11 +288,19 @@ public class TrainingTest {
     public void addDataToTraining() throws SQLException {
         AddTrainingDataUseCase useCase = new AddTrainingDataUseCase(trainingService);
 
-        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
+        Optional<TrainingType> trainingTypeOptional = trainingTypeService.find("Training");
+        if (trainingTypeOptional.isEmpty()) {
+            Assertions.fail("No training type");
+        }
 
-        useCase.addTrainingData(t, "test", 1);
+        Optional<Training> trainingOptional = trainingService.find(mockUser2, LocalDate.now(), trainingTypeOptional.get());
+        if (trainingOptional.isEmpty()) {
+            Assertions.fail("No training");
+        }
 
-        Assertions.assertEquals(1, trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get().getTrainingData().size());
+        useCase.addTrainingData(trainingOptional.get(), "test", 1);
+
+        Assertions.assertEquals(1, trainingOptional.get().getTrainingData().size());
     }
 
 }

@@ -29,3 +29,4 @@ A workout diary app that lets you record your workouts, review them, and analyze
 # Completed tasks
 
 1. [Task 1](../../pull/1/)
+2. [Task 2](../../pull/2/)

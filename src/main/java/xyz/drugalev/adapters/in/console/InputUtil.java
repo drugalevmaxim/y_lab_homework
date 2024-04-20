@@ -16,7 +16,7 @@ public class InputUtil {
     /**
      * String that prints to indicate user input.
      */
-    public static String PROMPT = "> ";
+    public static final String PROMPT = "> ";
     private final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     /**

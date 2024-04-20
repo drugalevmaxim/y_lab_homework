@@ -4,9 +4,8 @@ import lombok.NonNull;
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
-import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +22,7 @@ public interface TrainingService {
      *
      * @return list of all trainings.
      */
-    List<Training> findAll();
+    List<Training> findAll() throws SQLException;
 
     /**
      * Returns a list of all trainings user performed.
@@ -31,17 +30,17 @@ public interface TrainingService {
      * @param user user which performed trainings.
      * @return list of all trainings user performed.
      */
-    List<Training> findAllByUser(@NonNull User user);
+    List<Training> findAllByUser(@NonNull User user) throws SQLException;
 
     /**
      * Search for training by given performer, Training type and date.
      *
      * @param user user which performed training.
-     * @param type type of training that was performed.
      * @param date date when training was performed.
+     * @param type type of training that was performed.
      * @return training if found, empty otherwise, wrapped in an {@link Optional}.
      */
-    Optional<Training> find(@NonNull User user, TrainingType type, LocalDate date);
+    Optional<Training> find(@NonNull User user, @NonNull LocalDate date, @NonNull TrainingType type) throws SQLException;
 
     /**
      * Returns a list of all trainings user performed between given dates.
@@ -50,9 +49,8 @@ public interface TrainingService {
      * @param start min date of performed trainings.
      * @param end   max date of performed trainings.
      * @return list of all trainings user performed between given dates.
-     * @throws IllegalDatePeriodException if start > end.
      */
-    List<Training> findByUserBetweenDates(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
+    List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException;
 
     /**
      * Returns training stats in Map with "Duration" and "Calories" keys
@@ -61,23 +59,33 @@ public interface TrainingService {
      * @param start starting date.
      * @param end   ending date.
      * @return Map with "Duration" and "Calories" keys.
-     * @throws IllegalDatePeriodException if start > end.
      */
-    Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException;
+    Map<String, Integer> getTrainingsStats(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException;
+
+    void save(@NonNull User performer, @NonNull LocalDate date, @NonNull TrainingType type, int duration, int burnedCalories) throws SQLException;
 
     /**
-     * Saves a given training to repository.
+     * Updates given training.
      *
-     * @param training training to save.
-     * @return saved Training.
-     * @throws TrainingAlreadyExistsException if training already exists.
+     * @param training training to update.
+     * @param duration new duration.
+     * @param burnedCalories new burned calories.
      */
-    Training save(Training training) throws TrainingAlreadyExistsException;
+    void update(@NonNull Training training, int duration, int burnedCalories) throws SQLException;
 
     /**
      * Deletes a given training.
      *
      * @param training training to delete.
      */
-    void delete(Training training);
+    void delete(@NonNull Training training) throws SQLException;
+
+    /**
+     * Adds additional data to training.
+     *
+     * @param training training to update.
+     * @param name name of additional data.
+     * @param value value  of additional data.
+     */
+    void addData(@NonNull Training training, @NonNull String name, int value) throws SQLException;
 }

@@ -4,6 +4,7 @@ import xyz.drugalev.domain.entity.User;
 import xyz.drugalev.domain.exception.UserNotFoundException;
 import xyz.drugalev.domain.service.UserService;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 /**
@@ -21,7 +22,7 @@ public class LoginUserUseCase {
         this.userService = userService;
     }
 
-    public User login(String username, String password) throws UserNotFoundException {
+    public User login(String username, String password) throws UserNotFoundException, SQLException {
         Optional<User> user = userService.findUser(username);
 
         if (user.isEmpty() || !user.get().getPassword().equals(password)) {

@@ -3,6 +3,8 @@ package xyz.drugalev.usecase.trainingtype;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.service.TrainingTypeService;
 
+import java.sql.SQLException;
+
 /**
  * Use case for adding training type.
  *
@@ -26,7 +28,8 @@ public class AddTrainingTypeUseCase {
      * @param trainingTypeName Training type name to save.
      * @return saved Training type.
      */
-    public TrainingType add(String trainingTypeName) {
-        return trainingTypeService.save(new TrainingType(trainingTypeName));
+    public TrainingType add(String trainingTypeName) throws SQLException {
+        trainingTypeService.save(trainingTypeName);
+        return trainingTypeService.find(trainingTypeName).get();
     }
 }

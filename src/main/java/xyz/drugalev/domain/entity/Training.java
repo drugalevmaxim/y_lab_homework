@@ -4,32 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-/**
- * Training entity.
- *
- * @author Drugalev Maxim
- */
 @Data
 @AllArgsConstructor
 public class Training {
+    private final int id;
     private final User performer;
     private final LocalDate date;
     private final TrainingType trainingType;
-    private final List<TrainingData> trainingData  = new ArrayList<>();
+    private final Set<TrainingData> trainingData  = new HashSet<>();
     private int duration;
     private int burnedCalories;
-
-    /**
-     * Represents training as string.
-     *
-     * @return string representation.
-     */
-    @Override
-    public String toString() {
-        return performer.getUsername() + " done " + this.trainingType + " at " + this.date.toString() + " for " + this.duration
-                + " min, burned " + this.burnedCalories + " cal";
-    }
 }

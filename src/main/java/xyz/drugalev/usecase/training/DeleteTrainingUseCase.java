@@ -3,6 +3,8 @@ package xyz.drugalev.usecase.training;
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.service.TrainingService;
 
+import java.sql.SQLException;
+
 /**
  * UseCase for deleting training.
  *
@@ -25,7 +27,7 @@ public class DeleteTrainingUseCase {
      *
      * @param training training to delete.
      */
-    public void delete(Training training) {
+    public void delete(Training training) throws SQLException {
         trainingService.delete(training);
     }
 }

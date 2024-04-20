@@ -1,8 +1,9 @@
 package xyz.drugalev.usecase.training;
 
 import xyz.drugalev.domain.entity.Training;
-import xyz.drugalev.domain.entity.TrainingData;
 import xyz.drugalev.domain.service.TrainingService;
+
+import java.sql.SQLException;
 
 /**
  * UseCase for adding data to training
@@ -22,12 +23,13 @@ public class AddTrainingDataUseCase {
     }
 
     /**
-     * Add training data to training
+     * Add training data to training.
      *
-     * @param training     training to which training data will be added
-     * @param trainingData training data to add;
+     * @param training     training to which training data will be added.
+     * @param name name of added data.
+     * @param value value of added data.
      */
-    public void addTrainingData(Training training, TrainingData trainingData) {
-        training.getTrainingData().add(trainingData);
+    public void addTrainingData(Training training, String name, int value) throws SQLException {
+        trainingService.addData(training, name, value);
     }
 }

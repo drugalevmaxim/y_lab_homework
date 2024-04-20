@@ -4,11 +4,11 @@ package xyz.drugalev.usecase.training;
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
+import xyz.drugalev.domain.exception.IllegalDateException;
 import xyz.drugalev.domain.exception.NegativeArgumentException;
-import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
 import xyz.drugalev.domain.service.TrainingService;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 /**
@@ -33,15 +33,14 @@ public class AddTrainingUseCase {
      *
      * @param user           user which performed trainings.
      * @param date           date when training that was performed.
-     * @param TrainingType   type of training that was performed.
+     * @param trainingType   type of training that was performed.
      * @param duration       duration of training.
      * @param burnedCalories burned calories while training.
      * @return added training.
      * @throws NegativeArgumentException      if duration or burned calories less than 0.
-     * @throws IllegalDatePeriodException     if date > today.
-     * @throws TrainingAlreadyExistsException if training already exists.
+     * @throws IllegalDateException     if date > today.
      */
-    public Training add(User user, LocalDate date, TrainingType TrainingType, int duration, int burnedCalories) throws TrainingAlreadyExistsException, IllegalDatePeriodException, NegativeArgumentException {
+    public Training add(User user, LocalDate date, TrainingType trainingType, int duration, int burnedCalories) throws IllegalDateException, NegativeArgumentException, SQLException {
         if (duration < 0) {
             throw new NegativeArgumentException("duration less than 0");
         }
@@ -49,8 +48,10 @@ public class AddTrainingUseCase {
             throw new NegativeArgumentException("burned calories less than 0");
         }
         if (date.isAfter(LocalDate.now())) {
-            throw new IllegalDatePeriodException("date > today");
+            throw new IllegalDateException("date > today");
         }
-        return trainingService.save(new Training(user, date, TrainingType, duration, burnedCalories));
+
+        trainingService.save(user, date, trainingType, duration, burnedCalories);
+        return trainingService.find(user, date, trainingType).get();
     }
 }

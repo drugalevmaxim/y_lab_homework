@@ -1,8 +1,11 @@
 package xyz.drugalev.domain.service;
 
+import lombok.NonNull;
 import xyz.drugalev.domain.entity.TrainingType;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An interface that defines training types service.
@@ -15,14 +18,14 @@ public interface TrainingTypeService {
      *
      * @return list of Training types.
      */
-    List<TrainingType> findAll();
+    List<TrainingType> findAll() throws SQLException;
 
+    Optional<TrainingType> find(String trainingTypeName) throws SQLException;
 
     /**
-     * Saves given Training type.
+     * Save training type to repository
      *
-     * @param TrainingType Training type to save.
-     * @return saved Training type.
+     * @param trainingTypeName training type name
      */
-    TrainingType save(TrainingType TrainingType);
+    void save(@NonNull String trainingTypeName) throws SQLException;
 }

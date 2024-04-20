@@ -1,211 +1,229 @@
 package xyz.drugalev;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+
+import org.junit.jupiter.api.*;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import xyz.drugalev.config.MigrationLoader;
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
+import xyz.drugalev.domain.exception.IllegalDateException;
 import xyz.drugalev.domain.exception.NegativeArgumentException;
-import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
-import xyz.drugalev.domain.repository.impl.TrainingRepositoryImpl;
+import xyz.drugalev.domain.repository.TrainingTypeRepository;
+import xyz.drugalev.domain.repository.UserRepository;
+import xyz.drugalev.domain.repository.impl.*;
 import xyz.drugalev.domain.service.TrainingService;
+import xyz.drugalev.domain.service.TrainingTypeService;
 import xyz.drugalev.domain.service.impl.TrainingServiceImpl;
+import xyz.drugalev.domain.service.impl.TrainingTypeServiceImpl;
 import xyz.drugalev.usecase.training.*;
+import xyz.drugalev.usecase.trainingtype.AddTrainingTypeUseCase;
+import xyz.drugalev.usecase.trainingtype.FindTrainingTypeUseCase;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static xyz.drugalev.config.JDBCConnectionProvider.setConnectionCredentials;
+
+@Testcontainers
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TrainingTest {
+    @Container
+    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:alpine");
 
-    TrainingService trainingService;
-
-    @BeforeEach
-    public void setUp() {
-        trainingService = new TrainingServiceImpl(new TrainingRepositoryImpl());
+    private static UserRepository userRepository;
+    private static TrainingService trainingService;
+    private static TrainingTypeService trainingTypeService;
+    private static User mockUser1;
+    private static User mockUser2;
+    @BeforeAll
+    public static void setUp() throws SQLException {
+        container.start();
+        setConnectionCredentials(container.getJdbcUrl(),container.getUsername(), container.getPassword());
+        MigrationLoader.migrate();
+        TrainingTypeRepository trainingTypeRepository = new TrainingTypeRepositoryImpl();
+        userRepository = new UserRepositoryImpl(new RoleRepositoryImpl(new PrivilegeRepositoryImpl()));
+        trainingTypeService = new TrainingTypeServiceImpl(trainingTypeRepository);
+        trainingService = new TrainingServiceImpl(new TrainingRepositoryImpl(trainingTypeRepository, new TrainingDataRepositoryImpl(), userRepository));
+        userRepository.save("test_1", "test_1");
+        userRepository.save("test_2", "test_2");
+        mockUser1 = userRepository.find("test_1").get();
+        mockUser2 = userRepository.find("test_2").get();
     }
 
     @Test
+    @Order(1)
+    public void addTrainingType() throws SQLException {
+        String name = "Training";
+        AddTrainingTypeUseCase useCase = new AddTrainingTypeUseCase(trainingTypeService);
+        useCase.add(name);
+        Assertions.assertTrue(trainingTypeService.findAll().stream().anyMatch(tt -> tt.getName().equals(name)));
+    }
+
+    @Test
+    @Order(2)
+    public void getAllTenTrainingTypes() throws SQLException {
+        FindTrainingTypeUseCase useCase = new FindTrainingTypeUseCase(trainingTypeService);
+        for (int i = 0; i < 10; i++) {
+            trainingTypeService.save(String.valueOf(i));
+        }
+        Assertions.assertEquals(11, useCase.findAll().size());
+    }
+
+    @Test
+    @Order(3)
     public void addTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        Training t = new Training(new User("", ""),
-                LocalDate.now(),
-                new TrainingType("Test"),
-                1, 1);
-        useCase.add(t.getPerformer(), t.getDate(), t.getTrainingType(), t.getDuration(), t.getBurnedCalories());
-        Assertions.assertTrue(trainingService.find(t.getPerformer(), t.getTrainingType(), t.getDate()).isPresent());
+        useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 10, 10);
+        Assertions.assertTrue(trainingService.find(mockUser1, LocalDate.now(),  trainingTypeService.find("Training").get()).isPresent());
     }
 
     @Test
+    @Order(4)
     public void addExistingTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        Training t = new Training(new User("", ""),
-                LocalDate.now(),
-                new TrainingType("Test"),
-                1, 1);
-        useCase.add(t.getPerformer(), t.getDate(), t.getTrainingType(), t.getDuration(), t.getBurnedCalories());
-        Assertions.assertThrows(TrainingAlreadyExistsException.class, () ->
-                useCase.add(t.getPerformer(), t.getDate(), t.getTrainingType(), t.getDuration(), t.getBurnedCalories()));
+       Assertions.assertThrows(SQLException.class, () ->
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 10, 10));
     }
 
     @Test
+    @Order(5)
     public void addTrainingWithFutureData() {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        Training t = new Training(new User("", ""),
-                LocalDate.now().plusDays(1),
-                new TrainingType("Test"),
-                1, 1);
-        Assertions.assertThrows(IllegalDatePeriodException.class, () ->
-                useCase.add(t.getPerformer(), t.getDate(), t.getTrainingType(), t.getDuration(), t.getBurnedCalories()));
+        Assertions.assertThrows(IllegalDateException.class, () ->
+                useCase.add(mockUser1, LocalDate.now().plusDays(1), trainingTypeService.find("Training").get(), 10, 10));
     }
 
     @Test
+    @Order(6)
     public void addTrainingWithNegativeDuration() {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.add(new User("", ""), LocalDate.now(), new TrainingType(""), -1, 1));
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), -1, 1));
     }
 
     @Test
+    @Order(7)
     public void addTrainingWithNegativeBurnedCalories() {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.add(new User("", ""), LocalDate.now(), new TrainingType(""), 1, -1));
+                useCase.add(mockUser1, LocalDate.now(), trainingTypeService.find("Training").get(), 1, -1));
     }
 
     @Test
-    public void isTrainingsSorted() throws TrainingAlreadyExistsException, IllegalDatePeriodException, NegativeArgumentException {
+    @Order(8)
+    public void isTrainingsSorted() throws NegativeArgumentException, SQLException, IllegalDateException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
-        User u = new User("1", "1");
-        TrainingType tt = new TrainingType("Test");
+        TrainingType tt = trainingTypeService.find("Training").get();
 
-        useCase.add(u, LocalDate.now().minusDays(2), tt, 0, 0);
-        useCase.add(u, LocalDate.now(), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(1), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(3), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(6), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(4), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(5), tt, 0, 0);
-        useCase.add(u, LocalDate.now().minusDays(7), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(2), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(1), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(3), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(6), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(4), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(5), tt, 0, 0);
+        useCase.add(mockUser1, LocalDate.now().minusDays(7), tt, 0, 0);
+
         FindTrainingUseCase findUseCase = new FindTrainingUseCase(trainingService);
-        List<Training> trainings = findUseCase.findAllByUser(u);
+        List<Training> trainings = findUseCase.findAllByUser(mockUser1);
         Training prevTraining = trainings.get(0);
         for (Training training : trainings) {
             if (training.getDate().isAfter(prevTraining.getDate())) {
                 Assertions.fail();
             }
         }
-
     }
 
     @Test
+    @Order(9)
     public void findAllTrainings() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
 
-        for (int i = 0; i < 5; i++) {
-            trainingService.save(new Training(new User(String.valueOf(i), String.valueOf(i)), LocalDate.now(), new TrainingType(String.valueOf(i)), 1, 1));
-            trainingService.save(new Training(new User(String.valueOf(i) + 5, String.valueOf(i) + 5), LocalDate.now(), new TrainingType(String.valueOf(i)), 1, 1));
-        }
-
         List<Training> list = useCase.findAll();
-        Assertions.assertEquals(10, list.size());
+        Assertions.assertEquals(8, list.size());
 
     }
 
     @Test
+    @Order(10)
     public void findUserTrainings() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
-
-        User u1 = new User("1", "1");
-        User u2 = new User("2", "2");
-
         for (int i = 0; i < 5; i++) {
-            trainingService.save(new Training(u1, LocalDate.now(), new TrainingType(String.valueOf(i)), 1, 1));
-            trainingService.save(new Training(u2, LocalDate.now(), new TrainingType(String.valueOf(i)), 1, 1));
+            trainingService.save(mockUser2, LocalDate.now().minusDays(i), trainingTypeService.find("Training").get(), 1, 2);
         }
-        List<Training> list = useCase.findAllByUser(u1);
-        Assertions.assertEquals(5, list.size());
-        for (Training t : list) {
-            Assertions.assertEquals(t.getPerformer(), u1);
-        }
+        Assertions.assertEquals(useCase.findAllByUser(mockUser2).size(), 5);
     }
 
     @Test
+    @Order(11)
     public void findUserTrainingsBetween() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
 
-        User u1 = new User("1", "1");
-        User u2 = new User("2", "2");
-
-        for (int i = 0; i < 5; i++) {
-            trainingService.save(new Training(u1, LocalDate.now().minusDays(i), new TrainingType("Test1"), 1, 1));
-            trainingService.save(new Training(u2, LocalDate.now().minusDays(i), new TrainingType("Test2"), 1, 1));
-        }
-        List<Training> list = useCase.findBetween(u1, LocalDate.now().minusDays(2), LocalDate.now());
+        List<Training> list = useCase.findBetween(mockUser2, LocalDate.now().minusDays(2), LocalDate.now());
         Assertions.assertEquals(3, list.size());
     }
 
     @Test
-    public void illegalDatePeriodOnFindUserTrainingsBetween() {
-        FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
-
-        User u1 = new User("", "");
-
-        Assertions.assertThrows(IllegalDatePeriodException.class, () -> useCase.findBetween(u1, LocalDate.now(), LocalDate.now().minusDays(2)));
-    }
-
-    @Test
-    public void deleteTraining() throws Exception {
-        DeleteTrainingUseCase useCase = new DeleteTrainingUseCase(trainingService);
-        Training toDelete = new Training(new User("", ""), LocalDate.now(), new TrainingType("Test1"), 1, 1);
-        Training notToDelete = new Training(new User("", ""), LocalDate.now(), new TrainingType("Test2"), 1, 1);
-        trainingService.save(toDelete);
-        trainingService.save(notToDelete);
-        useCase.delete(toDelete);
-        Assertions.assertTrue(!trainingService.findAll().contains(toDelete) && trainingService.findAll().contains(notToDelete));
-    }
-
-    @Test
+    @Order(12)
     public void getTrainingsStats() throws Exception {
         GetTrainingStatsUseCase useCase = new GetTrainingStatsUseCase(trainingService);
 
-        User u1 = new User("1", "1");
-        User u2 = new User("2", "2");
+        Map<String, Integer> stats = useCase.getTrainingsStats(mockUser2, LocalDate.now().minusDays(4), LocalDate.now());
 
-        for (int i = 0; i < 5; i++) {
-            trainingService.save(new Training(u1, LocalDate.now().minusDays(i), new TrainingType("Test1"), 5, 1));
-            trainingService.save(new Training(u2, LocalDate.now().minusDays(i), new TrainingType("Test2"), 1, 5));
-        }
-
-        Map<String, Integer> stats1 = useCase.getTrainingsStats(u1, LocalDate.now().minusDays(4), LocalDate.now());
-        Map<String, Integer> stats2 = useCase.getTrainingsStats(u2, LocalDate.now().minusDays(4), LocalDate.now());
-
-        Assertions.assertEquals(25, stats1.get("Duration"));
-        Assertions.assertEquals(25, stats2.get("Calories"));
-
+        Assertions.assertEquals(5, stats.get("Duration"));
+        Assertions.assertEquals(10, stats.get("Calories"));
     }
+
     @Test
+    @Order(13)
+    public void deleteTraining() throws Exception {
+        DeleteTrainingUseCase useCase = new DeleteTrainingUseCase(trainingService);
+        useCase.delete(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeService.find("Training").get()).get());
+        Assertions.assertTrue(trainingService.find(mockUser2, LocalDate.now().minusDays(1), trainingTypeService.find("Training").get()).isEmpty());
+    }
+
+    @Test
+    @Order(14)
     public void successfulUpdateTrainings() throws Exception {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
+        GetTrainingStatsUseCase getStatsUseCase = new GetTrainingStatsUseCase(trainingService);
 
-        User u = new User("", "");
-        Training t = new Training(u, LocalDate.now(), new TrainingType("Test1"), 1, 1);
-        useCase.update(t, 5, 5);
+        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
 
-        Assertions.assertEquals(5, t.getDuration(), t.getBurnedCalories());
+        useCase.update(t, 100, 100);
+
+        Map<String, Integer> stats = getStatsUseCase.getTrainingsStats(mockUser2, LocalDate.now(), LocalDate.now());
+        Assertions.assertEquals(100, stats.get("Duration"));
+        Assertions.assertEquals(100, stats.get("Calories"));
     }
+
     @Test
-    public void unsuccessfulUpdateTrainings() {
+    @Order(15)
+    public void unsuccessfulUpdateTrainings() throws SQLException {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
 
-        User u = new User("", "");
-        Training t = new Training(u, LocalDate.now(), new TrainingType("Test2"), 1, 1);
+        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
+
         Assertions.assertThrows(NegativeArgumentException.class, () ->
-                useCase.update(t, 5, -5));
+                useCase.update(t, -100, -100)
+        );
     }
 
+    @Test
+    @Order(16)
+    public void addDataToTraining() throws SQLException {
+        AddTrainingDataUseCase useCase = new AddTrainingDataUseCase(trainingService);
 
+        Training t = trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get();
+
+        useCase.addTrainingData(t, "test", 1);
+
+        Assertions.assertEquals(1, trainingService.find(mockUser2, LocalDate.now(), trainingTypeService.find("Training").get()).get().getTrainingData().size());
+    }
 
 }
+

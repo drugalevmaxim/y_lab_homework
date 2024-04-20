@@ -1,9 +1,9 @@
 package xyz.drugalev.usecase.training;
 
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
 import xyz.drugalev.domain.service.TrainingService;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -28,16 +28,12 @@ public class GetTrainingStatsUseCase {
      * Returns training stats in Map with "Duration" and "Calories" keys
      *
      * @param user  user who performed training.
-     * @param start starting date.
-     * @param end   ending date.
+     * @param date1 starting date.
+     * @param date2 ending date.
      * @return Map with "Duration" and "Calories" keys.
-     * @throws IllegalDatePeriodException if start > end.
      */
-    public Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
-        if (start.isAfter(end)) {
-            throw new IllegalDatePeriodException("Start date is later than end date. ");
-        }
-        return trainingService.getTrainingsStats(user, start, end);
+    public Map<String, Integer> getTrainingsStats(User user, LocalDate date1, LocalDate date2) throws SQLException {
+        return trainingService.getTrainingsStats(user, date1, date2);
     }
 
 }

@@ -4,12 +4,19 @@ A workout diary app that lets you record your workouts, review them, and analyze
 
 # Note 
 
-**First added user will be admin**
+To auth as login use admin:admin. If you want to change it go to [002-insert-data.xml](src%2Fmain%2Fresources%2Fdatabase%2F002-insert-data.xml) and change next rows:
+```xml
+<insert tableName="users">
+    <column name="username" value="YOUR_ADMIN_USERNAME"/>
+    <column name="password" value="YOUR_ADMIN_PASSWORD"/>
+</insert>
+```
 
 # Requirements
 
 - JDK 17
 - Maven
+- Docker
 
 # Build and run
 
@@ -21,9 +28,13 @@ A workout diary app that lets you record your workouts, review them, and analyze
     ```bash
    mvn clean install
    ```
-3. Run the project by running the following command:
+3. Initialize docker database by running the following command
+   ```bash
+   docker-compose build
+   ```
+4. Run the project with migration by running the following command:
     ```bash
-    java -jar target/ylab-training-diary-1.0-SNAPSHOT.jar
+    java -jar target/ylab-training-diary.jar migrate
     ```
 
 # Completed tasks

@@ -3,6 +3,7 @@ package xyz.drugalev.usecase.trainingtype;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.service.TrainingTypeService;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class FindTrainingTypeUseCase {
      *
      * @return list of all training types
      */
-    public List<TrainingType> findAll() {
+    public List<TrainingType> findAll() throws SQLException {
         return trainingTypeService.findAll();
     }
 }

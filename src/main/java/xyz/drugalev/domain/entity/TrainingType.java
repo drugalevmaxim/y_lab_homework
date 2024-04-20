@@ -11,15 +11,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class TrainingType {
+    private final int id;
     private final String name;
-
-    /**
-     * Represents training type as string.
-     *
-     * @return string representation.
-     */
-    @Override
-    public String toString() {
-        return this.name;
-    }
 }

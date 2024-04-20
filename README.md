@@ -30,7 +30,7 @@ To auth as login use admin:admin. If you want to change it go to [002-insert-dat
    ```
 3. Initialize docker database by running the following command
    ```bash
-   docker-compose build
+   docker compose up
    ```
 4. Run the project with migration by running the following command:
     ```bash

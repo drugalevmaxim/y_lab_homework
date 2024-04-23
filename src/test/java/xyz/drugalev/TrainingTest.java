@@ -43,7 +43,7 @@ import static xyz.drugalev.config.JDBCConnectionProvider.setConnectionCredential
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TrainingTest {
     @Container
-    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:alpine");
+    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16.2-alpine3.19");
 
     private static TrainingService trainingService;
     private static TrainingTypeService trainingTypeService;

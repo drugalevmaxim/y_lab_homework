@@ -27,7 +27,7 @@ import static xyz.drugalev.config.JDBCConnectionProvider.setConnectionCredential
 public class UserLoginTest {
 
     @Container
-    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:alpine");
+    private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16.2-alpine3.19");
 
     private static UserService userService;
     @BeforeAll

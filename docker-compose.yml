@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: postgres:alpine
+    image: postgres:16.2-alpine3.19
     container_name: ylab_drugalev_db
     environment:
       POSTGRES_DB: ylab_drugalev

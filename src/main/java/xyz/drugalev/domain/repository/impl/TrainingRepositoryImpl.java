@@ -11,18 +11,34 @@ import xyz.drugalev.domain.repository.TrainingRepository;
 import xyz.drugalev.domain.repository.TrainingTypeRepository;
 import xyz.drugalev.domain.repository.UserRepository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The Training repository implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class TrainingRepositoryImpl implements TrainingRepository {
 
     private final TrainingTypeRepository trainingTypeRepository;
     private final TrainingDataRepository trainingDataRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Instantiates a new Training repository.
+     *
+     * @param trainingTypeRepository the training type repository
+     * @param trainingDataRepository the training data repository
+     * @param userRepository         the user repository
+     */
     public TrainingRepositoryImpl(TrainingTypeRepository trainingTypeRepository, TrainingDataRepository trainingDataRepository, UserRepository userRepository) {
         this.trainingTypeRepository = trainingTypeRepository;
         this.trainingDataRepository = trainingDataRepository;
@@ -55,13 +71,13 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     }
 
     @Override
-    public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate date1, @NonNull LocalDate date2) throws SQLException {
+    public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
             String findAllQuery = "SELECT id, performer, date, training_type, duration, burned_calories FROM ylab_trainings.trainings WHERE performer = ? AND date BETWEEN ? and ? ORDER BY date DESC;";
             PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
             findAllStatement.setInt(1, user.getId());
-            findAllStatement.setDate(2, Date.valueOf(date1));
-            findAllStatement.setDate(3, Date.valueOf(date2));
+            findAllStatement.setDate(2, Date.valueOf(start));
+            findAllStatement.setDate(3, Date.valueOf(end));
 
             ResultSet rsAll = findAllStatement.executeQuery();
 

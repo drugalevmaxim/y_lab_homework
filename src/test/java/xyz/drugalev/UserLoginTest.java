@@ -2,6 +2,7 @@ package xyz.drugalev;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -38,6 +39,7 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Registering and logging-in user")
     public void successfulRegistrationAndLogin() throws Exception {
         LoginUserUseCase useCase = new LoginUserUseCase(userService);
         RegisterUserUseCase registerUserUseCase = new RegisterUserUseCase(userService);
@@ -46,12 +48,14 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Trying to log in non-existing user")
     public void unsuccessfulLogin() {
         LoginUserUseCase useCase = new LoginUserUseCase(userService);
         Assertions.assertThrows(UserNotFoundException.class,
                 () -> useCase.login("wrongName", "wrongName"));
     }
     @Test
+    @DisplayName("Trying to register existing user")
     void unsuccessfulRegistration() {
         RegisterUserUseCase registerUserUseCase = new RegisterUserUseCase(userService);
         Assertions.assertThrows(SQLException.class,
@@ -62,6 +66,7 @@ public class UserLoginTest {
     }
 
     @Test
+    @DisplayName("Trying to register with invalid user data")
     void invalidUserData() {
         RegisterUserUseCase registerUserUseCase = new RegisterUserUseCase(userService);
         Assertions.assertThrows(ValidationException.class, () -> registerUserUseCase.register("1", "1"));

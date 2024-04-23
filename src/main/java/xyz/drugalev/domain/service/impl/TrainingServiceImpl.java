@@ -14,9 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The Training service implementation.
+ */
 public class TrainingServiceImpl implements TrainingService {
     private final TrainingRepository trainingRepository;
 
+    /**
+     * Instantiates a new Training service.
+     *
+     * @param TrainingRepository the training repository
+     */
     public TrainingServiceImpl(@NonNull TrainingRepository TrainingRepository) {
         this.trainingRepository = TrainingRepository;
     }

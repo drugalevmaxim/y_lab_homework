@@ -2,6 +2,8 @@ package xyz.drugalev.domain.exception;
 
 /**
  * Exception thrown when given int expected to be positive, but negative is given.
+ *
+ * @author Drugalev Maxim
  */
 public class NegativeArgumentException extends Exception {
     /**

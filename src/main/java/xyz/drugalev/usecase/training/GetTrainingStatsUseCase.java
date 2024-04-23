@@ -25,15 +25,15 @@ public class GetTrainingStatsUseCase {
     }
 
     /**
-     * Returns training stats in Map with "Duration" and "Calories" keys
+     * Returns training stats in Map with "Duration" and "Calories" keys.
      *
      * @param user  user who performed training.
-     * @param date1 starting date.
-     * @param date2 ending date.
+     * @param start starting date.
+     * @param end ending date.
      * @return Map with "Duration" and "Calories" keys.
      */
-    public Map<String, Integer> getTrainingsStats(User user, LocalDate date1, LocalDate date2) throws SQLException {
-        return trainingService.getTrainingsStats(user, date1, date2);
+    public Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws SQLException {
+        return trainingService.getTrainingsStats(user, start, end);
     }
 
 }

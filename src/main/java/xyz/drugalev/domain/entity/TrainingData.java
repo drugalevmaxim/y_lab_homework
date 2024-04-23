@@ -3,6 +3,11 @@ package xyz.drugalev.domain.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+/**
+ * Training data entity.
+ *
+ * @author Drugalev Maxim
+ */
 @Data
 @AllArgsConstructor
 public class TrainingData {

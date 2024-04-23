@@ -13,9 +13,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
 
+/**
+ * The User repository implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class UserRepositoryImpl implements UserRepository {
     private final RoleRepository roleRepository;
 
+    /**
+     * Instantiates a new User repository.
+     *
+     * @param roleRepository the role repository
+     */
     public UserRepositoryImpl(RoleRepository roleRepository) {
         this.roleRepository = roleRepository;
     }

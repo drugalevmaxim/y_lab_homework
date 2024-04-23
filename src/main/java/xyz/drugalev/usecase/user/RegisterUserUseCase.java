@@ -30,7 +30,8 @@ public class RegisterUserUseCase {
      * @param username username of user to register.
      * @param password password of user to register.
      * @return registered user.
-     * @throws ValidationException        if passed username/password is invalid.
+     * @throws ValidationException if passed username/password is invalid.
+     * @throws SQLException        the sql exception
      */
     public User register(String username, String password) throws ValidationException, SQLException {
         userService.save(username, password);

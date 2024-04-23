@@ -14,7 +14,7 @@ public class AddTrainingTypeUseCase {
     private final TrainingTypeService trainingTypeService;
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param trainingTypeService service that use case works with.
      */
@@ -27,6 +27,7 @@ public class AddTrainingTypeUseCase {
      *
      * @param trainingTypeName Training type name to save.
      * @return saved Training type.
+     * @throws SQLException the sql exception
      */
     public TrainingType add(String trainingTypeName) throws SQLException {
         trainingTypeService.save(trainingTypeName);

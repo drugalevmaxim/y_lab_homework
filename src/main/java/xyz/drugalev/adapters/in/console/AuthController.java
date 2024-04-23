@@ -10,9 +10,24 @@ import xyz.drugalev.usecase.user.RegisterUserUseCase;
 
 import java.sql.SQLException;
 
+/**
+ * The user auth controller.
+ *
+ * @author Drugalev Maxim
+ */
 public class AuthController {
 
-    public static User loginScreen(UserService userService, InputUtil inputUtil) throws UserNotFoundException, SQLException {
+    /**
+     * Login screen user.
+     *
+     * @param userService the user service
+     * @param inputUtil   the input util
+     * @return the logged-in user
+     * @throws UserNotFoundException the user not found exception
+     * @throws SQLException          the sql exception
+     */
+    public static User loginScreen(UserService userService, InputUtil inputUtil)
+            throws UserNotFoundException, SQLException {
         System.out.print("Username");
         String username = inputUtil.getLine();
         System.out.print("Password");
@@ -26,7 +41,17 @@ public class AuthController {
             return user;
     }
 
-    public static User registerScreen(UserService userService, InputUtil inputUtil) throws ValidationException, SQLException {
+    /**
+     * Register screen user.
+     *
+     * @param userService the user service
+     * @param inputUtil   the input util
+     * @return the registered user
+     * @throws ValidationException the validation exception
+     * @throws SQLException        the sql exception
+     */
+    public static User registerScreen(UserService userService, InputUtil inputUtil)
+            throws ValidationException, SQLException {
         System.out.print("Username");
         String username = inputUtil.getLine();
         System.out.print("Password");

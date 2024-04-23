@@ -15,9 +15,19 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * The Role repository  implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class RoleRepositoryImpl implements RoleRepository {
     private final PrivilegeRepository privilegeRepository;
 
+    /**
+     * Instantiates a new Role repository.
+     *
+     * @param privilegeRepository the privilege repository
+     */
     public RoleRepositoryImpl(PrivilegeRepository privilegeRepository) {
         this.privilegeRepository = privilegeRepository;
     }

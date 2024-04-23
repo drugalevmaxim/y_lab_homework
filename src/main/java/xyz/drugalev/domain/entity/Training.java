@@ -7,6 +7,11 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Training entity.
+ *
+ * @author Drugalev Maxim
+ */
 @Data
 @AllArgsConstructor
 public class Training {

@@ -22,6 +22,15 @@ public class LoginUserUseCase {
         this.userService = userService;
     }
 
+    /**
+     * Login user.
+     *
+     * @param username the username
+     * @param password the password
+     * @return the logged-in user
+     * @throws UserNotFoundException the user not found exception
+     * @throws SQLException          the sql exception
+     */
     public User login(String username, String password) throws UserNotFoundException, SQLException {
         Optional<User> user = userService.findUser(username);
 

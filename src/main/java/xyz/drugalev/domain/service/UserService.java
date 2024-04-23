@@ -18,14 +18,17 @@ public interface UserService {
      *
      * @param username username to save.
      * @param password user password to save.
+     * @throws SQLException        the sql exception
+     * @throws ValidationException the validation exception
      */
     void save(@NonNull String username, @NonNull String password) throws SQLException, ValidationException;
 
     /**
      * Finds a user by its username.
      *
-     * @param username users name.
-     * @return user if found, empty otherwise, wrapped in an {@link Optional}.
+     * @param username users username.
+     * @return User if found, empty otherwise, wrapped in an {@link Optional}.
+     * @throws SQLException the sql exception
      */
     Optional<User> findUser(@NonNull String username) throws SQLException;
 }

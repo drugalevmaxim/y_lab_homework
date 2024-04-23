@@ -12,12 +12,22 @@ import xyz.drugalev.domain.exception.IllegalDateException;
 import xyz.drugalev.domain.exception.NegativeArgumentException;
 import xyz.drugalev.domain.repository.TrainingTypeRepository;
 import xyz.drugalev.domain.repository.UserRepository;
-import xyz.drugalev.domain.repository.impl.*;
+import xyz.drugalev.domain.repository.impl.PrivilegeRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.RoleRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.TrainingDataRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.TrainingRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.TrainingTypeRepositoryImpl;
+import xyz.drugalev.domain.repository.impl.UserRepositoryImpl;
 import xyz.drugalev.domain.service.TrainingService;
 import xyz.drugalev.domain.service.TrainingTypeService;
 import xyz.drugalev.domain.service.impl.TrainingServiceImpl;
 import xyz.drugalev.domain.service.impl.TrainingTypeServiceImpl;
-import xyz.drugalev.usecase.training.*;
+import xyz.drugalev.usecase.training.AddTrainingDataUseCase;
+import xyz.drugalev.usecase.training.AddTrainingUseCase;
+import xyz.drugalev.usecase.training.DeleteTrainingUseCase;
+import xyz.drugalev.usecase.training.FindTrainingUseCase;
+import xyz.drugalev.usecase.training.GetTrainingStatsUseCase;
+import xyz.drugalev.usecase.training.UpdateTrainingUseCase;
 import xyz.drugalev.usecase.trainingtype.AddTrainingTypeUseCase;
 import xyz.drugalev.usecase.trainingtype.FindTrainingTypeUseCase;
 
@@ -65,6 +75,7 @@ public class TrainingTest {
 
     @Test
     @Order(1)
+    @DisplayName("Adding training type")
     public void addTrainingType() throws SQLException {
         String name = "Training";
         AddTrainingTypeUseCase useCase = new AddTrainingTypeUseCase(trainingTypeService);
@@ -74,6 +85,7 @@ public class TrainingTest {
 
     @Test
     @Order(2)
+    @DisplayName("Adding and getting 10 training types")
     public void getAllTenTrainingTypes() throws SQLException {
         FindTrainingTypeUseCase useCase = new FindTrainingTypeUseCase(trainingTypeService);
         for (int i = 0; i < 10; i++) {
@@ -84,6 +96,7 @@ public class TrainingTest {
 
     @Test
     @Order(3)
+    @DisplayName("Adding training")
     public void addTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -98,6 +111,7 @@ public class TrainingTest {
 
     @Test
     @Order(4)
+    @DisplayName("Trying to add an existing training")
     public void addExistingTraining() throws Exception {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -112,6 +126,7 @@ public class TrainingTest {
 
     @Test
     @Order(5)
+    @DisplayName("Trying to add training with future date")
     public void addTrainingWithFutureData() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -126,6 +141,7 @@ public class TrainingTest {
 
     @Test
     @Order(6)
+    @DisplayName("Trying to add training with negative duration")
     public void addTrainingWithNegativeDuration() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -140,6 +156,7 @@ public class TrainingTest {
 
     @Test
     @Order(7)
+    @DisplayName("Trying to add training with negative burned calories")
     public void addTrainingWithNegativeBurnedCalories() throws SQLException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -154,6 +171,7 @@ public class TrainingTest {
 
     @Test
     @Order(8)
+    @DisplayName("Checking if added trainings is sorted")
     public void isTrainingsSorted() throws NegativeArgumentException, SQLException, IllegalDateException {
         AddTrainingUseCase useCase = new AddTrainingUseCase(trainingService);
 
@@ -182,6 +200,7 @@ public class TrainingTest {
 
     @Test
     @Order(9)
+    @DisplayName("Getting all trainings")
     public void findAllTrainings() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
 
@@ -192,6 +211,7 @@ public class TrainingTest {
 
     @Test
     @Order(10)
+    @DisplayName("Getting all trainings of user")
     public void findUserTrainings() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
 
@@ -208,6 +228,7 @@ public class TrainingTest {
 
     @Test
     @Order(11)
+    @DisplayName("Getting all trainings of user between dates")
     public void findUserTrainingsBetween() throws Exception {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
 
@@ -217,6 +238,7 @@ public class TrainingTest {
 
     @Test
     @Order(12)
+    @DisplayName("Getting user training stats")
     public void getTrainingsStats() throws Exception {
         GetTrainingStatsUseCase useCase = new GetTrainingStatsUseCase(trainingService);
 
@@ -228,6 +250,7 @@ public class TrainingTest {
 
     @Test
     @Order(13)
+    @DisplayName("Deleting user training")
     public void deleteTraining() throws Exception {
         DeleteTrainingUseCase useCase = new DeleteTrainingUseCase(trainingService);
 
@@ -242,6 +265,7 @@ public class TrainingTest {
 
     @Test
     @Order(14)
+    @DisplayName("Updating user training")
     public void successfulUpdateTrainings() throws Exception {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
         GetTrainingStatsUseCase getStatsUseCase = new GetTrainingStatsUseCase(trainingService);
@@ -265,6 +289,7 @@ public class TrainingTest {
 
     @Test
     @Order(15)
+    @DisplayName("Updating user training with invalid stats")
     public void unsuccessfulUpdateTrainings() throws SQLException {
         UpdateTrainingUseCase useCase = new UpdateTrainingUseCase(trainingService);
 
@@ -285,6 +310,7 @@ public class TrainingTest {
 
     @Test
     @Order(16)
+    @DisplayName("Adding data to training")
     public void addDataToTraining() throws SQLException {
         AddTrainingDataUseCase useCase = new AddTrainingDataUseCase(trainingService);
 

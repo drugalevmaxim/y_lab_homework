@@ -15,10 +15,10 @@ public interface UserRepository {
 
     /**
      * Saves given user.
-     * Note: First added user will be admin.
      *
-     * @param username user name.
-     * @param password user password.
+     * @param username users username to save.
+     * @param password users password to save.
+     * @throws SQLException the sql exception
      */
     void save(@NonNull String username, @NonNull String password) throws SQLException;
 
@@ -27,6 +27,7 @@ public interface UserRepository {
      *
      * @param username the username of the user to find.
      * @return an optional containing the user if it was found, or empty otherwise
+     * @throws SQLException the sql exception
      */
     Optional<User> find(@NonNull String username) throws SQLException;
 
@@ -35,6 +36,7 @@ public interface UserRepository {
      *
      * @param id the id of the user to find.
      * @return an optional containing the user if it was found, or empty otherwise
+     * @throws SQLException the sql exception
      */
     Optional<User> find( int id) throws SQLException;
 }

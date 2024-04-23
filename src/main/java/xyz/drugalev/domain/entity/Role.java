@@ -6,10 +6,14 @@ import lombok.Data;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * User role entity.
+ *
+ * @author Drugalev Maxim
+ */
 @Data
 @AllArgsConstructor
 public class Role {
-
     private final int id;
     private final String name;
     private final Set<Privilege> privileges = new HashSet<>();

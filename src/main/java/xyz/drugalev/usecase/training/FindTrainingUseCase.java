@@ -29,6 +29,7 @@ public class FindTrainingUseCase {
      * Returns list of all trainings.
      *
      * @return list of all trainings.
+     * @throws SQLException the sql exception
      */
     public List<Training> findAll() throws SQLException {
         return trainingService.findAll();
@@ -39,6 +40,7 @@ public class FindTrainingUseCase {
      *
      * @param user user who performed training.
      * @return list of all trainings.
+     * @throws SQLException the sql exception
      */
     public List<Training> findAllByUser(User user) throws SQLException {
         return trainingService.findAllByUser(user);
@@ -48,12 +50,12 @@ public class FindTrainingUseCase {
      * Returns list of all users trainings performed between given dates.
      *
      * @param user  user who performed training.
-     * @param date1 starting date.
-     * @param date2 ending date.
+     * @param start starting date.
+     * @param end ending date.
      * @return list of all trainings.
+     * @throws SQLException the sql exception
      */
-    public List<Training> findBetween(User user, LocalDate date1, LocalDate date2) throws  SQLException {
-
-        return trainingService.findByUserBetweenDates(user, date1, date2);
+    public List<Training> findBetween(User user, LocalDate start, LocalDate end) throws  SQLException {
+        return trainingService.findByUserBetweenDates(user, start, end);
     }
 }

@@ -30,6 +30,7 @@ public class UpdateTrainingUseCase {
      * @param duration       new training duration.
      * @param burnedCalories new training burned calories.
      * @throws NegativeArgumentException if duration or burned calories less than 0.
+     * @throws SQLException              the sql exception
      */
     public void update(Training training, int duration, int burnedCalories) throws NegativeArgumentException, SQLException {
         if (duration < 0) {

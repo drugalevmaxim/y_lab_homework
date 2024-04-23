@@ -14,7 +14,15 @@ import liquibase.exception.LiquibaseException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * The Migration loader.
+ *
+ * @author Drugalev Maxim
+ */
 public class MigrationLoader {
+    /**
+     * Do migration.
+     */
     public static void migrate(){
         try (Connection connection = JDBCConnectionProvider.getConnection();
              Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection))) {

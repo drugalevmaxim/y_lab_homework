@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * The Training type repository implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public Optional<TrainingType> find(int id) throws SQLException {

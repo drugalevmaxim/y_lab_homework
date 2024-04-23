@@ -13,6 +13,11 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Training data repository implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class TrainingDataRepositoryImpl implements TrainingDataRepository {
 
     @Override

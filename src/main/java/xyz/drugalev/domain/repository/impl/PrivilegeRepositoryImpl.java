@@ -13,6 +13,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * The Privilege repository  implementation.
+ *
+ * @author Drugalev Maxim
+ */
 public class PrivilegeRepositoryImpl implements PrivilegeRepository {
     @Override
     public Optional<Privilege> find(String name) throws SQLException {

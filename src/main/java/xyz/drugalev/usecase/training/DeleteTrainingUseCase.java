@@ -26,6 +26,7 @@ public class DeleteTrainingUseCase {
      * Deletes training.
      *
      * @param training training to delete.
+     * @throws SQLException the sql exception
      */
     public void delete(Training training) throws SQLException {
         trainingService.delete(training);

@@ -5,6 +5,11 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
+/**
+ * The Jdbc connection provider.
+ *
+ * @author Drugalev Maxim
+ */
 public class JDBCConnectionProvider {
     private JDBCConnectionProvider() {
     }
@@ -14,6 +19,13 @@ public class JDBCConnectionProvider {
     private static String db_user = RESOURCE_BUNDLE.getString("db_user");
     private static String pass = RESOURCE_BUNDLE.getString("db_pass");
 
+    /**
+     * Sets connection credentials.
+     *
+     * @param new_url     the new url
+     * @param new_db_user the new db user
+     * @param new_pass    the new pass
+     */
     public static void setConnectionCredentials(String new_url, String new_db_user, String new_pass) {
         url = new_url;
         db_user = new_db_user;

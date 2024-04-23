@@ -10,10 +10,19 @@ import xyz.drugalev.domain.validator.UserValidator;
 import java.sql.SQLException;
 import java.util.Optional;
 
+/**
+ * The User service implementation.
+ */
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserValidator userValidator;
 
+    /**
+     * Instantiates a new User service.
+     *
+     * @param userRepository the user repository
+     * @param userValidator  the user validator
+     */
     public UserServiceImpl(@NonNull UserRepository userRepository, @NonNull UserValidator userValidator) {
         this.userRepository = userRepository;
         this.userValidator = userValidator;

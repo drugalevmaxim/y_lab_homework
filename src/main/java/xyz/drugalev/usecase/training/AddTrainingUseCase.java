@@ -12,7 +12,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 /**
- * UseCase for adding training
+ * UseCase for adding training.
  *
  * @author Drugalev Maxim
  */
@@ -29,7 +29,7 @@ public class AddTrainingUseCase {
     }
 
     /**
-     * Add training
+     * Add training.
      *
      * @param user           user which performed trainings.
      * @param date           date when training that was performed.
@@ -37,10 +37,12 @@ public class AddTrainingUseCase {
      * @param duration       duration of training.
      * @param burnedCalories burned calories while training.
      * @return added training.
-     * @throws NegativeArgumentException      if duration or burned calories less than 0.
-     * @throws IllegalDateException     if date > today.
+     * @throws IllegalDateException      if date > today.
+     * @throws NegativeArgumentException if duration or burned calories less than 0.
+     * @throws SQLException              the sql exception
      */
-    public Training add(User user, LocalDate date, TrainingType trainingType, int duration, int burnedCalories) throws IllegalDateException, NegativeArgumentException, SQLException {
+    public Training add(User user, LocalDate date, TrainingType trainingType, int duration, int burnedCalories)
+            throws IllegalDateException, NegativeArgumentException, SQLException {
         if (duration < 0) {
             throw new NegativeArgumentException("duration less than 0");
         }

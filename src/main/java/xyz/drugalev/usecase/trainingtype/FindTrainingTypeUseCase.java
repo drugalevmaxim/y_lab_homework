@@ -15,7 +15,7 @@ public class FindTrainingTypeUseCase {
     private final TrainingTypeService trainingTypeService;
 
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param trainingTypeService service that use case works with.
      */
@@ -24,9 +24,10 @@ public class FindTrainingTypeUseCase {
     }
 
     /**
-     * Returns list of all training types
+     * Returns list of all training types.
      *
      * @return list of all training types
+     * @throws SQLException the sql exception
      */
     public List<TrainingType> findAll() throws SQLException {
         return trainingTypeService.findAll();

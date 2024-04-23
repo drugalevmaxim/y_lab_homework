@@ -11,7 +11,12 @@ import xyz.drugalev.domain.exception.IllegalDateException;
 import xyz.drugalev.domain.exception.NegativeArgumentException;
 import xyz.drugalev.domain.service.TrainingService;
 import xyz.drugalev.domain.service.TrainingTypeService;
-import xyz.drugalev.usecase.training.*;
+import xyz.drugalev.usecase.training.AddTrainingDataUseCase;
+import xyz.drugalev.usecase.training.AddTrainingUseCase;
+import xyz.drugalev.usecase.training.DeleteTrainingUseCase;
+import xyz.drugalev.usecase.training.FindTrainingUseCase;
+import xyz.drugalev.usecase.training.GetTrainingStatsUseCase;
+import xyz.drugalev.usecase.training.UpdateTrainingUseCase;
 import xyz.drugalev.usecase.trainingtype.AddTrainingTypeUseCase;
 import xyz.drugalev.usecase.trainingtype.FindTrainingTypeUseCase;
 
@@ -22,8 +27,22 @@ import java.util.Map;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
+/**
+ * The Training controller.
+ */
 public class TrainingController {
 
+    /**
+     * Add training screen.
+     *
+     * @param trainingService     the training service
+     * @param trainingTypeService the training type service
+     * @param currentUser         the current user
+     * @param inputUtil           the input util
+     * @throws SQLException              the sql exception
+     * @throws NegativeArgumentException the negative argument exception
+     * @throws IllegalDateException      the illegal date exception
+     */
     public static void addTrainingScreen(TrainingService trainingService, TrainingTypeService trainingTypeService, User currentUser, InputUtil inputUtil) throws SQLException, NegativeArgumentException, IllegalDateException {
         Menu selectTypeMenu = new Menu(inputUtil);
 
@@ -53,6 +72,15 @@ public class TrainingController {
         Audit.getInstance().log(currentUser, "adding training");
     }
 
+    /**
+     * Gets all user trainings screen.
+     *
+     * @param trainingService the training service
+     * @param currentUser     the current user
+     * @param inputUtil       the input util
+     * @throws SQLException              the sql exception
+     * @throws NegativeArgumentException the negative argument exception
+     */
     public static void getAllUserTrainingsScreen(TrainingService trainingService, User currentUser, InputUtil inputUtil) throws SQLException, NegativeArgumentException {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
         List<Training> trainings = useCase.findAllByUser(currentUser);
@@ -60,6 +88,15 @@ public class TrainingController {
         viewTrainingsScreen(trainingService, trainings, currentUser, inputUtil);
     }
 
+    /**
+     * Gets trainings in period screen.
+     *
+     * @param trainingService the training service
+     * @param currentUser     the current user
+     * @param inputUtil       the input util
+     * @throws SQLException              the sql exception
+     * @throws NegativeArgumentException the negative argument exception
+     */
     public static void getTrainingsInPeriodScreen(TrainingService trainingService, User currentUser, InputUtil inputUtil) throws SQLException, NegativeArgumentException {
         FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
         LocalDate start = inputUtil.getLocalDate();
@@ -69,6 +106,14 @@ public class TrainingController {
         viewTrainingsScreen(trainingService, trainings, currentUser, inputUtil);
     }
 
+    /**
+     * Gets stats in period screen.
+     *
+     * @param trainingService the training service
+     * @param currentUser     the current user
+     * @param inputUtil       the input util
+     * @throws SQLException the sql exception
+     */
     public static void getStatsInPeriodScreen(TrainingService trainingService, User currentUser, InputUtil inputUtil) throws SQLException {
         GetTrainingStatsUseCase useCase = new GetTrainingStatsUseCase(trainingService);
         LocalDate start = inputUtil.getLocalDate();
@@ -82,6 +127,14 @@ public class TrainingController {
         Audit.getInstance().log(currentUser, "requesting training stats in period");
     }
 
+    /**
+     * Add training type screen.
+     *
+     * @param trainingTypeService the training type service
+     * @param currentUser         the current user
+     * @param inputUtil           the input util
+     * @throws SQLException the sql exception
+     */
     public static void addTrainingTypeScreen(TrainingTypeService trainingTypeService, User currentUser, InputUtil inputUtil) throws SQLException {
         System.out.print("Training Type Name");
         String trainingTypeName = inputUtil.getLine();
@@ -91,6 +144,15 @@ public class TrainingController {
         Audit.getInstance().log(currentUser, "adding training type");
     }
 
+    /**
+     * Gets other users trainings screen.
+     *
+     * @param trainingService the training service
+     * @param currentUser     the current user
+     * @param inputUtil       the input util
+     * @throws SQLException              the sql exception
+     * @throws NegativeArgumentException the negative argument exception
+     */
     public static void getOtherUsersTrainingsScreen(TrainingService trainingService, User currentUser, InputUtil inputUtil) throws SQLException, NegativeArgumentException {
             FindTrainingUseCase useCase = new FindTrainingUseCase(trainingService);
             List<Training> trainings = useCase.findAll();

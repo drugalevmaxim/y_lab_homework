@@ -4,7 +4,7 @@ A workout diary app that lets you record your workouts, review them, and analyze
 
 # Note 
 
-To auth as login use admin:admin. If you want to change it go to [002-insert-data.xml](src%2Fmain%2Fresources%2Fdatabase%2F002-insert-data.xml) and change next rows:
+To auth as login use admin:admin. If you want to change it go to [002-insert-data.xml](src/main/resources/database/002-insert-data.xml) and change next rows:
 ```xml
 <insert tableName="users">
     <column name="username" value="YOUR_ADMIN_USERNAME"/>

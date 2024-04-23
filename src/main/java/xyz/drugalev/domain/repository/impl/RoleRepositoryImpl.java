@@ -35,7 +35,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     @Override
     public Optional<Role> find(String name) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findRoleQuery = "SELECT id, name FROM ylab_trainings.roles WHERE name = ?";
+            String findRoleQuery = "SELECT * FROM ylab_trainings.roles WHERE name = ?";
             PreparedStatement findRoleStatement = connection.prepareStatement(findRoleQuery);
             findRoleStatement.setString(1, name);
             ResultSet rsRole = findRoleStatement.executeQuery();
@@ -57,7 +57,7 @@ public class RoleRepositoryImpl implements RoleRepository {
     @Override
     public Set<Role> findUserRoles(int userId) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String userRolesQuery = "SELECT id, name FROM ylab_trainings.roles WHERE id IN (SELECT role_id FROM ylab_trainings.user_roles WHERE user_id = ?);";
+            String userRolesQuery = "SELECT * FROM ylab_trainings.roles WHERE id IN (SELECT role_id FROM ylab_trainings.user_roles WHERE user_id = ?);";
             PreparedStatement userRolesStatement = connection.prepareStatement(userRolesQuery);
             userRolesStatement.setInt(1, userId);
             ResultSet rsRoles = userRolesStatement.executeQuery();

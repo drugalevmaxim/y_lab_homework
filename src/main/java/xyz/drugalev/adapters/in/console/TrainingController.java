@@ -61,13 +61,17 @@ public class TrainingController {
         }
 
         TrainingType selectedType = trainingTypes.get(Integer.parseInt(userPick));
+
+        System.out.println("Training date");
+        LocalDate date = inputUtil.getLocalDate();
+
         System.out.print("Training duration");
         int duration = inputUtil.getInt();
         System.out.print("Burned Calories");
         int burnedCalories = inputUtil.getInt();
 
         AddTrainingUseCase addTrainingUseCase = new AddTrainingUseCase(trainingService);
-        addTrainingUseCase.add(currentUser, LocalDate.now(), selectedType, duration, burnedCalories);
+        addTrainingUseCase.add(currentUser, date, selectedType, duration, burnedCalories);
 
         Audit.getInstance().log(currentUser, "adding training");
     }
@@ -195,21 +199,15 @@ public class TrainingController {
             }
 
             switch (editTrainingMenu.open()) {
-                case Menu.MENU_EXIT: {
+                case Menu.MENU_EXIT -> {
                     return;
                 }
-                case "ADD_DATA": {
+                case "ADD_DATA" ->
                     addTrainingDataScreen(trainingService, training, currentUser, inputUtil);
-                    break;
-                }
-                case "EDIT": {
+                case "EDIT" ->
                     editTrainingScreen(trainingService, training, currentUser, inputUtil);
-                    break;
-                }
-                case "DELETE": {
+                case "DELETE" ->
                     deleteTrainingScreen(trainingService, training, currentUser);
-                    return;
-                }
             }
         }
     }

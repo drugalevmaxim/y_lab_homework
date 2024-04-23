@@ -22,7 +22,7 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
     @Override
     public Optional<Privilege> find(String name) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findPrivilegeQuery = "SELECT id, name FROM ylab_trainings.privileges WHERE name = ?";
+            String findPrivilegeQuery = "SELECT * FROM ylab_trainings.privileges WHERE name = ?";
             PreparedStatement findPrivilegeStatement = connection.prepareStatement(findPrivilegeQuery);
             findPrivilegeStatement.setString(1, name);
 
@@ -39,7 +39,7 @@ public class PrivilegeRepositoryImpl implements PrivilegeRepository {
     public Set<Privilege> findRolePrivileges(Role role) throws SQLException {
         Set<Privilege> privilegeSet =  new HashSet<>();
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findPrivilegeQuery = "SELECT id, name FROM ylab_trainings.privileges WHERE id IN (SELECT id FROM ylab_trainings.role_privileges WHERE role_id = ?)";
+            String findPrivilegeQuery = "SELECT * FROM ylab_trainings.privileges WHERE id IN (SELECT id FROM ylab_trainings.role_privileges WHERE role_id = ?)";
             PreparedStatement findPrivilegeStatement = connection.prepareStatement(findPrivilegeQuery);
             findPrivilegeStatement.setInt(1, role.getId());
 

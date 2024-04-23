@@ -48,7 +48,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public List<Training> findAll() throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findAllQuery = "SELECT id, performer, date, training_type, duration, burned_calories FROM ylab_trainings.trainings ORDER BY date DESC;";
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings ORDER BY date DESC;";
             PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
 
             ResultSet rsAll = findAllStatement.executeQuery();
@@ -60,7 +60,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public List<Training> findAllByUser(@NonNull User user) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findAllQuery = "SELECT id, performer, date, training_type, duration, burned_calories FROM ylab_trainings.trainings WHERE performer = ? ORDER BY date DESC;";
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? ORDER BY date DESC;";
             PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
             findAllStatement.setInt(1, user.getId());
 
@@ -73,7 +73,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findAllQuery = "SELECT id, performer, date, training_type, duration, burned_calories FROM ylab_trainings.trainings WHERE performer = ? AND date BETWEEN ? and ? ORDER BY date DESC;";
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? AND date BETWEEN ? and ? ORDER BY date DESC;";
             PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
             findAllStatement.setInt(1, user.getId());
             findAllStatement.setDate(2, Date.valueOf(start));
@@ -88,7 +88,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
     @Override
     public Optional<Training> find(@NonNull User user, @NonNull TrainingType type, @NonNull LocalDate date) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findQuery = ("SELECT id, performer, date, training_type, duration, burned_calories FROM ylab_trainings.trainings WHERE performer = ? AND date = ? AND training_type = ?");
+            String findQuery = ("SELECT * FROM ylab_trainings.trainings WHERE performer = ? AND date = ? AND training_type = ?");
             PreparedStatement findStatement = connection.prepareStatement(findQuery);
             findStatement.setInt(1, user.getId());
             findStatement.setDate(2, Date.valueOf(date));

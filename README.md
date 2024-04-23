@@ -32,9 +32,9 @@ To auth as login use admin:admin. If you want to change it go to [002-insert-dat
    ```bash
    docker compose up -d
    ```
-4. Run the project with migration by running the following command:
+4. Run the project by running the following command:
     ```bash
-    java -jar target/ylab-training-diary.jar migrate
+    java -jar target/ylab-training-diary.jar
     ```
 
 # Completed tasks

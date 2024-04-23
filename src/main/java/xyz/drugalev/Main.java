@@ -14,11 +14,7 @@ public class Main
      * @param args the input arguments
      */
     public static void main(String[] args) {
-
-        if (args.length == 1 && args[0].equals("migrate")) {
-            MigrationLoader.migrate();
-        }
-
+        MigrationLoader.migrate();
         ConsoleApplication application = new ConsoleApplication();
         application.run();
     }

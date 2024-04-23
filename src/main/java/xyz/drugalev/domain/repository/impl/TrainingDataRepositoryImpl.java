@@ -50,7 +50,7 @@ public class TrainingDataRepositoryImpl implements TrainingDataRepository {
     @Override
     public List<TrainingData> find(Training training) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findQuery = "SELECT id, name, value FROM ylab_trainings.training_data WHERE id IN (SELECT training_data_id FROM ylab_trainings.training_training_data WHERE training_id = ?);";
+            String findQuery = "SELECT * FROM ylab_trainings.training_data WHERE id IN (SELECT training_data_id FROM ylab_trainings.training_training_data WHERE training_id = ?);";
             PreparedStatement findStatement = connection.prepareStatement(findQuery);
             findStatement.setInt(1, training.getId());
             ResultSet rsFind = findStatement.executeQuery();

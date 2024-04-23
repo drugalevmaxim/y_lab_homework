@@ -54,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> find(@NonNull String username) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findUserQuery = "SELECT id, username, password FROM ylab_trainings.users WHERE username = ?;";
+            String findUserQuery = "SELECT * FROM ylab_trainings.users WHERE username = ?;";
 
             PreparedStatement findUserStatement = connection.prepareStatement(findUserQuery);
             findUserStatement.setString(1, username);
@@ -67,7 +67,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> find(int id) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findUserQuery = "SELECT id, username, password FROM ylab_trainings.users WHERE id = ?;";
+            String findUserQuery = "SELECT * FROM ylab_trainings.users WHERE id = ?;";
 
             PreparedStatement findUserStatement = connection.prepareStatement(findUserQuery);
             findUserStatement.setInt(1, id);

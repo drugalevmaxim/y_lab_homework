@@ -21,7 +21,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public Optional<TrainingType> find(int id) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findQuery = "SELECT id, name FROM ylab_trainings.training_types WHERE id = ?;";
+            String findQuery = "SELECT * FROM ylab_trainings.training_types WHERE id = ?;";
             PreparedStatement findStatement = connection.prepareStatement(findQuery);
             findStatement.setInt(1, id);
 
@@ -38,7 +38,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public Optional<TrainingType> find(String trainingTypeName) throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findQuery = "SELECT id, name FROM ylab_trainings.training_types WHERE name = ?;";
+            String findQuery = "SELECT * FROM ylab_trainings.training_types WHERE name = ?;";
             PreparedStatement findStatement = connection.prepareStatement(findQuery);
             findStatement.setString(1, trainingTypeName);
 
@@ -55,7 +55,7 @@ public class TrainingTypeRepositoryImpl implements TrainingTypeRepository {
     @Override
     public List<TrainingType> findAll() throws SQLException {
         try (Connection connection = JDBCConnectionProvider.getConnection()) {
-            String findQuery = "SELECT id, name FROM ylab_trainings.training_types;";
+            String findQuery = "SELECT * FROM ylab_trainings.training_types;";
             PreparedStatement findStatement = connection.prepareStatement(findQuery);
 
             ResultSet rsFind = findStatement.executeQuery();

@@ -1,47 +1,55 @@
 package xyz.drugalev.domain.service.impl;
 
+import lombok.NonNull;
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
-import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
 import xyz.drugalev.domain.repository.TrainingRepository;
 import xyz.drugalev.domain.service.TrainingService;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The Training service implementation.
+ */
 public class TrainingServiceImpl implements TrainingService {
     private final TrainingRepository trainingRepository;
 
-    public TrainingServiceImpl(TrainingRepository TrainingRepository) {
+    /**
+     * Instantiates a new Training service.
+     *
+     * @param TrainingRepository the training repository
+     */
+    public TrainingServiceImpl(@NonNull TrainingRepository TrainingRepository) {
         this.trainingRepository = TrainingRepository;
     }
 
     @Override
-    public List<Training> findAll() {
+    public List<Training> findAll() throws SQLException {
         return trainingRepository.findAll();
     }
 
     @Override
-    public List<Training> findAllByUser(User user) {
+    public List<Training> findAllByUser(@NonNull User user) throws SQLException {
         return trainingRepository.findAllByUser(user);
     }
 
     @Override
-    public Optional<Training> find(User user, TrainingType type, LocalDate date) {
+    public Optional<Training> find(@NonNull User user, @NonNull LocalDate date, @NonNull TrainingType type) throws SQLException {
         return trainingRepository.find(user, type, date);
     }
 
     @Override
-    public List<Training> findByUserBetweenDates(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
+    public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException {
         return trainingRepository.findByUserBetweenDates(user, start, end);
     }
 
-    public Map<String, Integer> getTrainingsStats(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
+    public Map<String, Integer> getTrainingsStats(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException {
         Map<String, Integer> stats = new HashMap<>();
         int dur = 0;
         int cal = 0;
@@ -55,12 +63,22 @@ public class TrainingServiceImpl implements TrainingService {
     }
 
     @Override
-    public Training save(Training Training) throws TrainingAlreadyExistsException {
-        return trainingRepository.save(Training);
+    public void save(@NonNull User performer, @NonNull LocalDate date, @NonNull TrainingType type, int duration, int burnedCalories) throws SQLException {
+        trainingRepository.save(performer, date, type, duration, burnedCalories);
     }
 
     @Override
-    public void delete(Training training) {
+    public void update(@NonNull Training training, int duration, int burnedCalories) throws SQLException {
+        trainingRepository.update(training, duration, burnedCalories);
+    }
+
+    @Override
+    public void delete(@NonNull Training training) throws SQLException {
         trainingRepository.delete(training);
+    }
+
+    @Override
+    public void addData(@NonNull Training training, @NonNull String name, int value) throws SQLException {
+        trainingRepository.addData(training, name, value);
     }
 }

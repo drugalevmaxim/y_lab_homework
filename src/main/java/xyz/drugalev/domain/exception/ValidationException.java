@@ -1,5 +1,10 @@
 package xyz.drugalev.domain.exception;
 
+/**
+ * Exception thrown when given data has not passed validation.
+ *
+ * @author Drugalev Maxim
+ */
 public class ValidationException extends Exception {
     /**
      * Default constructor.

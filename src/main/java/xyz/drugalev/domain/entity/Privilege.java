@@ -1,22 +1,16 @@
 package xyz.drugalev.domain.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
- * List of privileges.
+ * User privilege entity.
  *
  * @author Drugalev Maxim
  */
-public enum Privilege {
-    /**
-     * Privilege to add training type.
-     */
-    ADD_TRAINING_TYPE,
-    /**
-     * Privilege to see other users trainings.
-     */
-    SEE_OTHERS_TRAININGS,
-    /**
-     * Privilege to see audit logs.
-     */
-    SEE_AUDIT_LOG
-
+@Data
+@AllArgsConstructor
+public class Privilege {
+    private final int id;
+    private final String name;
 }

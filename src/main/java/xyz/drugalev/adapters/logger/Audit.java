@@ -21,7 +21,7 @@ public class Audit {
     /**
      * Get audit instance.
      *
-     * @return audit instance.
+     * @return audit instance
      */
     public static Audit getInstance() {
         if (_instance == null) {
@@ -33,7 +33,8 @@ public class Audit {
     /**
      * Log action in audit.
      *
-     * @param action action to log.
+     * @param user   the user
+     * @param action action to log
      */
     public void log(User user, String action) {
         records.add(new AuditRecord(user, LocalDateTime.now(), action));
@@ -41,6 +42,8 @@ public class Audit {
 
     /**
      * Get actions log from audit.
+     *
+     * @return the audit records
      */
     public List<AuditRecord> getAuditRecords() {
         return records;

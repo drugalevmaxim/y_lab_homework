@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.5.xsd"
+        logicalFilePath="database/changelog.xml">
+
+    <changeSet id="002-insert-data.xml" author="drugalevmaxim">
+        <insert tableName="users">
+            <column name="username" value="admin"/>
+            <column name="password" value="admin"/>
+        </insert>
+        <insert tableName="privileges">
+            <column name="name" value="ADD_TRAINING_TYPE"/>
+        </insert>
+        <insert tableName="privileges">
+            <column name="name" value="OTHER_USERS_TRAININGS"/>
+        </insert>
+        <insert tableName="privileges">
+            <column name="name" value="SEE_AUDIT_LOG"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="admin"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="name" value="user"/>
+        </insert>
+        <insert tableName="role_privileges">
+            <column name="role_id" value="1"/>
+            <column name="privilege_id" value="1"/>
+        </insert>
+        <insert tableName="role_privileges">
+            <column name="role_id" value="1"/>
+            <column name="privilege_id" value="2"/>
+        </insert>
+        <insert tableName="role_privileges">
+            <column name="role_id" value="1"/>
+            <column name="privilege_id" value="3"/>
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" value="1"/>
+            <column name="role_id" value="1"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

@@ -2,9 +2,9 @@ package xyz.drugalev.usecase.training;
 
 import xyz.drugalev.domain.entity.Training;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
 import xyz.drugalev.domain.service.TrainingService;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -29,8 +29,9 @@ public class FindTrainingUseCase {
      * Returns list of all trainings.
      *
      * @return list of all trainings.
+     * @throws SQLException the sql exception
      */
-    public List<Training> findAll() {
+    public List<Training> findAll() throws SQLException {
         return trainingService.findAll();
     }
 
@@ -39,8 +40,9 @@ public class FindTrainingUseCase {
      *
      * @param user user who performed training.
      * @return list of all trainings.
+     * @throws SQLException the sql exception
      */
-    public List<Training> findAllByUser(User user) {
+    public List<Training> findAllByUser(User user) throws SQLException {
         return trainingService.findAllByUser(user);
     }
 
@@ -49,15 +51,11 @@ public class FindTrainingUseCase {
      *
      * @param user  user who performed training.
      * @param start starting date.
-     * @param end   ending date.
+     * @param end ending date.
      * @return list of all trainings.
-     * @throws IllegalDatePeriodException if start > end
+     * @throws SQLException the sql exception
      */
-    public List<Training> findBetween(User user, LocalDate start, LocalDate end) throws IllegalDatePeriodException {
-        if (start.isAfter(end)) {
-            throw new IllegalDatePeriodException("Start date is later than end date. ");
-        }
-
+    public List<Training> findBetween(User user, LocalDate start, LocalDate end) throws  SQLException {
         return trainingService.findByUserBetweenDates(user, start, end);
     }
 }

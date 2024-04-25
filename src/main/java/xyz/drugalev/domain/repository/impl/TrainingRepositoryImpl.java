@@ -1,88 +1,192 @@
 package xyz.drugalev.domain.repository.impl;
 
 import lombok.NonNull;
+import xyz.drugalev.config.JDBCConnectionProvider;
 import xyz.drugalev.domain.entity.Training;
+import xyz.drugalev.domain.entity.TrainingData;
 import xyz.drugalev.domain.entity.TrainingType;
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.IllegalDatePeriodException;
-import xyz.drugalev.domain.exception.TrainingAlreadyExistsException;
+import xyz.drugalev.domain.repository.TrainingDataRepository;
 import xyz.drugalev.domain.repository.TrainingRepository;
+import xyz.drugalev.domain.repository.TrainingTypeRepository;
+import xyz.drugalev.domain.repository.UserRepository;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * Training repository implementation
- * Stores all data in memory
+ * The Training repository implementation.
  *
  * @author Drugalev Maxim
  */
 public class TrainingRepositoryImpl implements TrainingRepository {
-    private final Map<User, Map<LocalDate, Map<TrainingType, Training>>> trainings = new HashMap<>();
-    @Override
-    public List<Training> findAll() {
-        return trainings.values().stream().map(Map::values).flatMap(Collection::stream).map(Map::values).flatMap(Collection::stream).toList();
+
+    private final TrainingTypeRepository trainingTypeRepository;
+    private final TrainingDataRepository trainingDataRepository;
+    private final UserRepository userRepository;
+
+    /**
+     * Instantiates a new Training repository.
+     *
+     * @param trainingTypeRepository the training type repository
+     * @param trainingDataRepository the training data repository
+     * @param userRepository         the user repository
+     */
+    public TrainingRepositoryImpl(TrainingTypeRepository trainingTypeRepository, TrainingDataRepository trainingDataRepository, UserRepository userRepository) {
+        this.trainingTypeRepository = trainingTypeRepository;
+        this.trainingDataRepository = trainingDataRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public List<Training> findAllByUser(@NonNull User user) {
-        return this.trainings.get(user).values().stream().map(Map::values).flatMap(Collection::stream).sorted(Comparator.comparing(Training::getDate).reversed()).toList();
-    }
+    public List<Training> findAll() throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings ORDER BY date DESC;";
+            PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
 
-    @Override
-    public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws IllegalDatePeriodException {
-        if (start.isAfter(end)) {
-            throw new IllegalDatePeriodException("start > end");
+            ResultSet rsAll = findAllStatement.executeQuery();
+
+            return mapTrainingList(rsAll);
         }
-
-        return findAllByUser(user).stream().filter(t -> t.getDate().isAfter(start.minusDays(1))
-                && t.getDate().isBefore(end.plusDays(1))).toList();
     }
 
     @Override
-    public Optional<Training> find(@NonNull User user, @NonNull TrainingType type, @NonNull LocalDate date) {
-        if (!trainings.containsKey(user)
-                && !trainings.get(user).containsKey(date)
-                && !trainings.get(user).get(date).containsKey(type)) {
+    public List<Training> findAllByUser(@NonNull User user) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? ORDER BY date DESC;";
+            PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
+            findAllStatement.setInt(1, user.getId());
+
+            ResultSet rsAll = findAllStatement.executeQuery();
+
+            return mapTrainingList(rsAll);
+        }
+    }
+
+    @Override
+    public List<Training> findByUserBetweenDates(@NonNull User user, @NonNull LocalDate start, @NonNull LocalDate end) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String findAllQuery = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? AND date BETWEEN ? and ? ORDER BY date DESC;";
+            PreparedStatement findAllStatement = connection.prepareStatement(findAllQuery);
+            findAllStatement.setInt(1, user.getId());
+            findAllStatement.setDate(2, Date.valueOf(start));
+            findAllStatement.setDate(3, Date.valueOf(end));
+
+            ResultSet rsAll = findAllStatement.executeQuery();
+
+            return mapTrainingList(rsAll);
+        }
+    }
+
+    @Override
+    public Optional<Training> find(@NonNull User user, @NonNull TrainingType type, @NonNull LocalDate date) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String findQuery = ("SELECT * FROM ylab_trainings.trainings WHERE performer = ? AND date = ? AND training_type = ?");
+            PreparedStatement findStatement = connection.prepareStatement(findQuery);
+            findStatement.setInt(1, user.getId());
+            findStatement.setDate(2, Date.valueOf(date));
+            findStatement.setInt(3, type.getId());
+
+            ResultSet rsFind = findStatement.executeQuery();
+
+            if (rsFind.next()) {
+                Optional<User> performer = userRepository.find(rsFind.getInt("performer"));
+                Optional<TrainingType> trainingType = trainingTypeRepository.find(rsFind.getInt("training_type"));
+
+                if (performer.isPresent() && trainingType.isPresent()) {
+                    Training training = new Training(rsFind.getInt("id"), performer.get(),
+                            rsFind.getDate("date").toLocalDate(), trainingType.get(),
+                            rsFind.getInt("duration"), rsFind.getInt("burned_calories"));
+
+                    for (TrainingData trainingData : trainingDataRepository.find(training)) {
+                        training.getTrainingData().add(trainingData);
+                    }
+                    return Optional.of(training);
+                }
+            }
+
             return Optional.empty();
         }
-        return Optional.ofNullable(trainings.get(user).get(date).get(type));
     }
 
     @Override
-    public Training save(@NonNull Training training) throws TrainingAlreadyExistsException {
-        if (!trainings.containsKey(training.getPerformer())) {
-            trainings.put(training.getPerformer(), new HashMap<>());
+    public void save(User performer, LocalDate date, TrainingType type, int duration, int burnedCalories) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String saveQuery = "INSERT INTO ylab_trainings.trainings(performer, date, training_type, duration, burned_calories) VALUES (?, ?, ?, ?, ?);";
+            PreparedStatement saveStatement = connection.prepareStatement(saveQuery);
+
+            saveStatement.setInt(1, performer.getId());
+            saveStatement.setDate(2, Date.valueOf(date));
+            saveStatement.setInt(3, type.getId());
+            saveStatement.setInt(4, duration);
+            saveStatement.setInt(5, burnedCalories);
+
+            saveStatement.execute();
         }
-        if (!trainings.get(training.getPerformer()).containsKey(training.getDate())) {
-            trainings.get(training.getPerformer()).put(training.getDate(), new HashMap<>());
+    }
+
+    @Override
+    public void delete(@NonNull Training training) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String deleteQuery = "DELETE FROM ylab_trainings.trainings WHERE id = ?;";
+            PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery);
+
+            deleteStatement.setInt(1, training.getId());
+
+            deleteStatement.execute();
         }
-        if (!trainings.get(training.getPerformer()).get(training.getDate()).containsKey(training.getTrainingType())) {
-            trainings.get(training.getPerformer()).get(training.getDate()).put(training.getTrainingType(), training);
-        } else {
-            if (trainings.get(training.getPerformer()).get(training.getDate()).get(training.getTrainingType()) != null ) {
-                System.out.println(trainings.get(training.getPerformer()).get(training.getDate()).get(training.getTrainingType()));
-                throw new TrainingAlreadyExistsException();
+    }
+
+    @Override
+    public void update(@NonNull Training training, int duration, int burnedCalories) throws SQLException {
+        try (Connection connection = JDBCConnectionProvider.getConnection()) {
+            String updateQuery = "UPDATE ylab_trainings.trainings SET duration=?, burned_calories=? WHERE id = ?;";
+            PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+
+            updateStatement.setInt(1, duration);
+            updateStatement.setInt(2, burnedCalories);
+            updateStatement.setInt(3, training.getId());
+
+            updateStatement.execute();
+
+            training.setDuration(duration);
+            training.setBurnedCalories(burnedCalories);
+
+        }
+    }
+
+    @Override
+    public void addData(@NonNull Training training, @NonNull String name, int value) throws SQLException {
+        trainingDataRepository.save(training, name, value);
+    }
+
+    private List<Training> mapTrainingList(ResultSet rsAll) throws SQLException {
+        List<Training> trainings = new ArrayList<>();
+
+        while (rsAll.next()) {
+
+            Optional<User> performer = userRepository.find(rsAll.getInt("performer"));
+            Optional<TrainingType> trainingType = trainingTypeRepository.find(rsAll.getInt("training_type"));
+
+            if (performer.isPresent() && trainingType.isPresent()) {
+                Training training = new Training(rsAll.getInt("id"), performer.get(),
+                        rsAll.getDate("date").toLocalDate(), trainingType.get(),
+                        rsAll.getInt("duration"), rsAll.getInt("burned_calories"));
+
+                for (TrainingData trainingData : trainingDataRepository.find(training)) {
+                    training.getTrainingData().add(trainingData);
+                }
+
+                trainings.add(training);
             }
         }
-
-        return training;
-    }
-
-    @Override
-    public void delete(@NonNull Training training) {
-        if (!trainings.containsKey(training.getPerformer())) {
-            return;
-        }
-        if (!trainings.get(training.getPerformer()).containsKey(training.getDate())) {
-            return;
-        }
-        if (!trainings.get(training.getPerformer()).get(training.getDate()).containsKey(training.getTrainingType())) {
-            return;
-        }
-        if (trainings.get(training.getPerformer()).get(training.getDate()).get(training.getTrainingType()) != null) {
-            trainings.get(training.getPerformer()).get(training.getDate()).remove(training.getTrainingType());
-        }
+        return trainings;
     }
 }

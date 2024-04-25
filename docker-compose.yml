@@ -1,0 +1,10 @@
+services:
+  postgres:
+    image: postgres:16.2-alpine3.19
+    container_name: ylab_drugalev_db
+    environment:
+      POSTGRES_DB: ylab_drugalev
+      POSTGRES_USER: ylab_drugalev
+      POSTGRES_PASSWORD: drugalev
+    ports:
+      - "5432:5432"

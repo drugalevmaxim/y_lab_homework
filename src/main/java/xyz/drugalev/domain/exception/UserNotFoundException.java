@@ -1,5 +1,10 @@
 package xyz.drugalev.domain.exception;
 
+/**
+ * Exception thrown when user not found in repository.
+ *
+ * @author Drugalev Maxim
+ */
 public class UserNotFoundException extends Exception {
     /**
      * Default constructor.

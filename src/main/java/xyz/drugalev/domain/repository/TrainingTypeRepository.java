@@ -1,28 +1,48 @@
 package xyz.drugalev.domain.repository;
 
-import lombok.NonNull;
 import xyz.drugalev.domain.entity.TrainingType;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * An interface that defines operations with Training types in repository.
+ * The interface Training type repository.
  *
  * @author Drugalev Maxim
  */
 public interface TrainingTypeRepository {
     /**
-     * Returns a list of all Training types stored in repository.
+     * Find optional.
      *
-     * @return list of Training types.
+     * @param id the id
+     * @return the optional
+     * @throws SQLException the sql exception
      */
-    List<TrainingType> findAll();
+    Optional<TrainingType> find(int id) throws SQLException;
 
     /**
-     * Saves given Training type.
+     * Find optional.
      *
-     * @param TrainingType Training type to save.
-     * @return saved Training type.
+     * @param trainingTypeName the training type name
+     * @return the optional
+     * @throws SQLException the sql exception
      */
-    TrainingType save(@NonNull TrainingType TrainingType);
+    Optional<TrainingType> find(String trainingTypeName) throws SQLException;
+
+    /**
+     * Find all list.
+     *
+     * @return the list
+     * @throws SQLException the sql exception
+     */
+    List<TrainingType> findAll() throws SQLException;
+
+    /**
+     * Save.
+     *
+     * @param trainingTypeName the training type name
+     * @throws SQLException the sql exception
+     */
+    void save(String trainingTypeName) throws SQLException;
 }

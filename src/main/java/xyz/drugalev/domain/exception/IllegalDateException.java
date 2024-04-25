@@ -1,17 +1,18 @@
 package xyz.drugalev.domain.exception;
 
 /**
- * Exception thrown when given int expected to be positive, but negative is given.
+ * Exception thrown when given date is incorrect,
+ * i.e. start date > today's date.
  *
  * @author Drugalev Maxim
  */
-public class NegativeArgumentException extends Exception {
+public class IllegalDateException extends Exception {
     /**
      * Default constructor.
      *
      * @param message message of exception.
      */
-    public NegativeArgumentException(String message) {
+    public IllegalDateException(String message) {
         super(message);
     }
 }

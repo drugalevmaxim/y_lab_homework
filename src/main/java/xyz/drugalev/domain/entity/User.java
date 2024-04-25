@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -15,9 +14,10 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 public class User {
+    private final int id;
     private final String username;
     private final String password;
-    private final Set<Role> roles = new HashSet<>(List.of(Role.USER));
+    private final Set<Role> roles = new HashSet<>();
 
     /**
      * Checks if user has given privilege.
@@ -25,7 +25,7 @@ public class User {
      * @param privilege privilege to check.
      * @return true if user has privilege, false otherwise.
      */
-    public boolean hasPrivilege(Privilege privilege) {
+    public boolean hasPrivilege(String privilege) {
         return roles.stream().anyMatch(role -> role.hasPermission((privilege)));
     }
 }

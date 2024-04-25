@@ -1,41 +1,24 @@
 package xyz.drugalev.domain.entity;
 
-import java.util.Arrays;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * User roles
+ * User role entity.
  *
  * @author Drugalev Maxim
  */
-public enum Role {
-    /**
-     * Default user privileges
-     */
-    USER(),
-    /**
-     * Administrator privileges, able to add training types
-     */
-    ADMIN(Privilege.ADD_TRAINING_TYPE, Privilege.SEE_OTHERS_TRAININGS, Privilege.SEE_AUDIT_LOG);
-    private final List<Privilege> privileges;
+@Data
+@AllArgsConstructor
+public class Role {
+    private final int id;
+    private final String name;
+    private final Set<Privilege> privileges = new HashSet<>();
 
-    /**
-     * Constructor for roles
-     *
-     * @param privileges privileges that role will have
-     * @see Privilege
-     */
-    Role(Privilege... privileges) {
-        this.privileges = Arrays.stream(privileges).toList();
-    }
-
-    /**
-     * Check if role has permission
-     *
-     * @param privilege privilege to check
-     * @return true if role has privilege, false otherwise
-     */
-    public boolean hasPermission(Privilege privilege) {
-        return this.privileges.contains(privilege);
+    public boolean hasPermission(String privilege) {
+        return this.privileges.stream().anyMatch(p -> p.getName().equals(privilege));
     }
 }

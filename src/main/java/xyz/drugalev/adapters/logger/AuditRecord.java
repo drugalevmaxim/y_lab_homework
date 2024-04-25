@@ -6,6 +6,11 @@ import xyz.drugalev.domain.entity.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * The type Audit record.
+ *
+ * @author Drugalev Maxim
+ */
 @RequiredArgsConstructor
 @Getter
 public class AuditRecord {

@@ -1,9 +1,10 @@
 package xyz.drugalev.usecase.user;
 
 import xyz.drugalev.domain.entity.User;
-import xyz.drugalev.domain.exception.UserAlreadyExistsException;
 import xyz.drugalev.domain.exception.ValidationException;
 import xyz.drugalev.domain.service.UserService;
+
+import java.sql.SQLException;
 
 /**
  * Use case for user registration
@@ -12,6 +13,7 @@ import xyz.drugalev.domain.service.UserService;
  */
 public class RegisterUserUseCase {
     private final UserService userService;
+
 
     /**
      * Default constructor.
@@ -28,10 +30,11 @@ public class RegisterUserUseCase {
      * @param username username of user to register.
      * @param password password of user to register.
      * @return registered user.
-     * @throws UserAlreadyExistsException if user with given username already exists.
-     * @throws ValidationException        if passed username/password is invalid.
+     * @throws ValidationException if passed username/password is invalid.
+     * @throws SQLException        the sql exception
      */
-    public User register(String username, String password) throws UserAlreadyExistsException, ValidationException {
-        return userService.save(new User(username, password));
+    public User register(String username, String password) throws ValidationException, SQLException {
+        userService.save(username, password);
+        return userService.findUser(username).get();
     }
 }

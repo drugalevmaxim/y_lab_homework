@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,15 +46,16 @@ public class TrainingsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+        String requestURI = req.getRequestURI().substring(req.getContextPath().length());
         final String regex = "^/trainings/([0-9]+)/?$";
         final Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(req.getRequestURI());
+        Matcher matcher = pattern.matcher(requestURI);
         if (matcher.matches()) {
             long id = Long.parseLong(matcher.group(1));
             handleGetSpecific(req, resp, id);
             return;
         }
-        if (!req.getRequestURI().equals("/trainings")) {
+        if (!req.getRequestURI().endsWith("/trainings")) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -102,7 +102,7 @@ public class TrainingsServlet extends HttpServlet {
     }
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
-        if (!Objects.equals(req.getRequestURI(), "/trainings")) {
+        if (!req.getRequestURI().endsWith("/trainings")) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
@@ -130,9 +130,10 @@ public class TrainingsServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            String requestURI = req.getRequestURI().substring(req.getContextPath().length());
             final String regex = "^/trainings/([0-9]+)/?$";
             final Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(req.getRequestURI());
+            Matcher matcher = pattern.matcher(requestURI);
             if (matcher.matches()) {
                 long id = Long.parseLong(matcher.group(1));
                 User user = (User) req.getSession().getAttribute("user");
@@ -150,9 +151,10 @@ public class TrainingsServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
         try {
+            String requestURI = req.getRequestURI().substring(req.getContextPath().length());
             final String regex = "^/trainings/([0-9]+)/?$";
             final Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(req.getRequestURI());
+            Matcher matcher = pattern.matcher(requestURI);
             if (matcher.matches()) {
                 long id = Long.parseLong(matcher.group(1));
                 TrainingDto training = objectMapper.readValue(req.getReader(), TrainingDto.class);

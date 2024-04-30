@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/audit")
-public class AuditServlet extends HttpServlet {`
+public class AuditServlet extends HttpServlet {
     private AuditService auditService;
     private ObjectMapper objectMapper;
 

@@ -8,11 +8,11 @@ import org.aspectj.lang.annotation.Pointcut;
 @Aspect
 public class LoggingAspect {
 
-    @Pointcut("@annotation(xyz.drugalev.aspect.annotation.Loggable)")
-    private void annotatedWithLoggable() {
+    @Pointcut("@annotation(xyz.drugalev.aspect.annotation.LogExecSpeed)")
+    private void annotatedWithLogExecSpeed() {
     }
 
-    @Around("annotatedWithLoggable()")
+    @Around("annotatedWithLogExecSpeed()")
     public Object logExecution(ProceedingJoinPoint joinPoint) throws Throwable {
 
         long start = System.currentTimeMillis();

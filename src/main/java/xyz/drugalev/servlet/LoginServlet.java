@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import xyz.drugalev.database.MigrationLoader;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.exception.UserNotFoundException;
 import xyz.drugalev.repository.impl.UserRepositoryImpl;
@@ -24,6 +25,7 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() {
+        MigrationLoader.migrate();
         authService = new AuthServiceImpl(new UserRepositoryImpl());
         this.objectMapper = JsonMapper.builder()
                 .findAndAddModules()

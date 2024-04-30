@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
+
 @WebFilter("/*")
 public class AuthenticationFilter extends HttpFilter {
 
@@ -22,7 +23,8 @@ public class AuthenticationFilter extends HttpFilter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse resp = (HttpServletResponse) response;
-        String requestURI = req.getRequestURI();
+        String requestURI = req.getRequestURI().substring(req.getContextPath().length());
+
 
         HttpSession session = req.getSession(false);
 

@@ -32,7 +32,7 @@ public interface TrainingService {
      * @throws SQLException           if there is an error querying the database
      * @throws TrainingNotFoundException if the training record with the given ID does not exist for the given user
      */
-    TrainingDto find(User user, Long id) throws SQLException, TrainingNotFoundException;
+    TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException;
 
     /**
      * Finds all training records for the given user.

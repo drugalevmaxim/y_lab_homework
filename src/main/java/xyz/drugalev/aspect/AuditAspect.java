@@ -26,12 +26,15 @@ public class AuditAspect {
     public Object logExecution(ProceedingJoinPoint joinPoint) throws Throwable {
 
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Object result = joinPoint.proceed();
+
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof User user) {
                 auditRepository.save(user, signature.getMethod().getAnnotation(Auditable.class).action());
                 break;
             }
         }
-        return joinPoint.proceed();
+
+        return result;
     }
 }

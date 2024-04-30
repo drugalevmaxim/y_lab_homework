@@ -3,7 +3,7 @@ package xyz.drugalev.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.mapstruct.factory.Mappers;
 import xyz.drugalev.aspect.annotation.Auditable;
-import xyz.drugalev.aspect.annotation.Loggable;
+import xyz.drugalev.aspect.annotation.LogExecSpeed;
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.entity.Training;
 import xyz.drugalev.entity.User;
@@ -38,16 +38,18 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Auditable(action = "find specified training by id")
-    public TrainingDto find(User user, Long id) throws SQLException, TrainingNotFoundException {
+    @LogExecSpeed
+    public TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException {
         Training training = trainingRepository.find(id).orElseThrow(TrainingNotFoundException::new);
-        if (training.getPerformer().getId() != user.getId() && !user.hasPrivilege("OTHER_USERS_TRAININGS")) {
+        System.out.println(555);
+        if (training.getPerformer().getId() != user.getId() || !user.hasPrivilege("OTHER_USERS_TRAININGS")) {
+            System.out.println(666);
             throw new TrainingNotFoundException();
         }
         return trainingMapper.toTrainingDto(training);
     }
 
     @Override
-    @Loggable
     @Auditable(action = "find all trainings of a user")
     public List<TrainingDto> findAllByUser(User user) throws SQLException {
         return trainingMapper.toTrainingDtos(trainingRepository.findAllByUser(user));

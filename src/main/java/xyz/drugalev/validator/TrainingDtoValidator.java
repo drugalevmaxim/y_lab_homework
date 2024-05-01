@@ -4,7 +4,17 @@ import xyz.drugalev.dto.TrainingDto;
 
 import java.time.LocalDate;
 
+/**
+ * Validator for {@link TrainingDto}.
+ */
 public class TrainingDtoValidator {
+
+    /**
+     * Validates a {@link TrainingDto}.
+     *
+     * @param trainingDto The {@link TrainingDto} to validate.
+     * @return True if the {@link TrainingDto} is valid, false otherwise.
+     */
     public static boolean isValid(TrainingDto trainingDto) {
         if (trainingDto == null) {
             return false;

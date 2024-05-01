@@ -14,7 +14,13 @@ import liquibase.exception.LiquibaseException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+/**
+ * This class is responsible for handling database migrations using Liquibase.
+ */
 public class MigrationLoader {
+    /**
+     * Executes database migrations using Liquibase.
+     */
     public static void migrate(){
         try (Connection connection = JDBCConnection.getConnection();
              Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(connection))) {

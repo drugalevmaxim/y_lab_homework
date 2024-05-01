@@ -9,6 +9,9 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Data transfer object for trainings.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

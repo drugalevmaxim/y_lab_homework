@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data transfer object for audit logs.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

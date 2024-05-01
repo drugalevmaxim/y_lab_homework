@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,11 +19,16 @@ import xyz.drugalev.database.MigrationLoader;
 import xyz.drugalev.entity.Training;
 import xyz.drugalev.entity.TrainingType;
 import xyz.drugalev.entity.User;
+import xyz.drugalev.in.servlet.TrainingsServlet;
 import xyz.drugalev.repository.TrainingRepository;
 import xyz.drugalev.repository.TrainingTypeRepository;
 import xyz.drugalev.repository.UserRepository;
-import xyz.drugalev.repository.impl.*;
-import xyz.drugalev.in.servlet.TrainingsServlet;
+import xyz.drugalev.repository.impl.PrivilegeRepositoryImpl;
+import xyz.drugalev.repository.impl.RoleRepositoryImpl;
+import xyz.drugalev.repository.impl.TrainingDataRepositoryImpl;
+import xyz.drugalev.repository.impl.TrainingRepositoryImpl;
+import xyz.drugalev.repository.impl.TrainingTypeRepositoryImpl;
+import xyz.drugalev.repository.impl.UserRepositoryImpl;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -30,7 +36,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDate;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @Testcontainers
 @ExtendWith(MockitoExtension.class)
@@ -41,10 +48,10 @@ public class TrainingServletTest {
     private static User adminUser;
     private static TrainingType mockTrainingType;
     private static TrainingRepository trainingRepository;
-    @InjectMocks
-    private TrainingsServlet trainingsServlet;
     @Mock
     HttpSession session;
+    @InjectMocks
+    private TrainingsServlet trainingsServlet;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -72,6 +79,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Save training with valid data provided")
     void TrainingsServlet_shouldSaveTraining_whenValidDataIsProvided() throws Exception {
         String jsonInput = "{" +
                 "\"date\": \"%s\",".formatted(LocalDate.now()) +
@@ -99,6 +107,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Not saving training with invalid data provided (date > today)")
     void TrainingsServlet_shouldNotSaveTraining_whenInvalidDataIsProvided() throws Exception {
         String jsonInput = "{" +
                 "\"date\": \"%s\",".formatted(LocalDate.now().plusDays(1)) +
@@ -123,6 +132,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Not saving training with invalid data provided (training already exists)")
     void TrainingsServlet_shouldNotSaveTraining_whenExistingDataIsProvided() throws Exception {
         String jsonInput = "{" +
                 "\"date\": \"%s\",".formatted(LocalDate.now().minusDays(1)) +
@@ -150,6 +160,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Not saving training with invalid data provided (invalid JSON format)")
     void TrainingsServlet_shouldNotSaveTraining_whenInvalidDataFormatIsProvided() throws Exception {
         String jsonInput = "{" +
                 "\"NotADate\": \"%s\",".formatted(LocalDate.now()) +
@@ -174,6 +185,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Deleting training with valid data provided")
     void TrainingsServlet_shouldDeleteTraining_whenValidDataIsProvided() throws Exception {
         Training t = new Training();
         t.setPerformer(mockUser);
@@ -199,6 +211,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Not deleting training with invalid data provided (non-existing training)")
     void TrainingsServlet_shouldDeleteTraining_whenInvalidDataIsProvided() {
         when(request.getContextPath()).thenReturn("");
         when(request.getRequestURI()).thenReturn("/trainings/%d".formatted(9999999));
@@ -211,6 +224,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Updating training with valid data provided")
     void TrainingsServlet_shouldUpdateTraining_whenValidDataIsProvided() throws Exception {
         Training t = new Training();
         t.setPerformer(mockUser);
@@ -250,6 +264,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Getting user training with valid data provided")
     void TrainingsServlet_getUserTrainings_whenDataIsProvided() throws Exception {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
@@ -279,6 +294,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Getting user training between dates with valid data provided")
     void TrainingsServlet_getUserTrainingsBetweenDates_whenDataIsProvided() throws Exception {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
@@ -316,6 +332,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Getting specified user training with valid data provided")
     void TrainingsServlet_getUserSpecificTraining_whenDataIsProvided() throws Exception {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
@@ -344,6 +361,7 @@ public class TrainingServletTest {
     }
 
     @Test
+    @DisplayName("Getting all training with valid data provided")
     void TrainingsServlet_getAllTraining_whenDataIsProvided() throws Exception {
         StringWriter outAll = new StringWriter();
         PrintWriter writerAll = new PrintWriter(outAll);
@@ -378,7 +396,6 @@ public class TrainingServletTest {
         trainingsServlet.init();
         trainingsServlet.doGet(request, response);
 
-
-        Assertions.assertTrue(outAll.toString().length() > outUser.toString().length() );
+        Assertions.assertTrue(outAll.toString().length() > outUser.toString().length());
     }
 }

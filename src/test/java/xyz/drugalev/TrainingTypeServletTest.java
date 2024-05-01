@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,13 +17,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import xyz.drugalev.database.JDBCConnection;
 import xyz.drugalev.database.MigrationLoader;
 import xyz.drugalev.entity.User;
+import xyz.drugalev.in.servlet.TrainingTypeServlet;
 import xyz.drugalev.repository.TrainingTypeRepository;
 import xyz.drugalev.repository.UserRepository;
 import xyz.drugalev.repository.impl.PrivilegeRepositoryImpl;
 import xyz.drugalev.repository.impl.RoleRepositoryImpl;
 import xyz.drugalev.repository.impl.TrainingTypeRepositoryImpl;
 import xyz.drugalev.repository.impl.UserRepositoryImpl;
-import xyz.drugalev.in.servlet.TrainingTypeServlet;
 
 import java.io.BufferedReader;
 import java.io.PrintWriter;
@@ -39,10 +40,10 @@ public class TrainingTypeServletTest {
     private static final PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16.2-alpine3.19");
     private static final User mockUser = new User();
     private static User adminUser;
-    @InjectMocks
-    private TrainingTypeServlet trainingTypeServlet;
     @Mock
     HttpSession session;
+    @InjectMocks
+    private TrainingTypeServlet trainingTypeServlet;
     @Mock
     private HttpServletRequest request;
     @Mock
@@ -65,6 +66,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Saving new training type with valid data provided")
     void TrainingTypeServlet_shouldSaveNewTrainingType_whenValidUserAndValidTrainingTypeProvided() throws Exception {
         String jsonInput = "{\"name\":\"testType1\"}";
         BufferedReader reader = new BufferedReader(new StringReader(jsonInput));
@@ -80,6 +82,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Not saving new training type with invalid data provided (user that has no privileges)")
     void TrainingTypeServlet_shouldNotSaveNewTrainingType_whenInvalidUserAndValidTrainingTypeProvided() throws Exception {
         String jsonInput = "{\"name\":\"testType2\"}";
         BufferedReader reader = new BufferedReader(new StringReader(jsonInput));
@@ -95,6 +98,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Not saving new training type with invalid data provided (existing training type)")
     void TrainingTypeServlet_shouldNotSaveNewTrainingType_whenValidUserAndExistingTrainingTypeProvided() throws Exception {
         String jsonInput = "{\"name\":\"testType\"}";
         BufferedReader reader = new BufferedReader(new StringReader(jsonInput));
@@ -110,6 +114,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Not saving new training type with invalid data provided (invalid JSON format)")
     void TrainingTypeServlet_shouldNotSaveNewTrainingType_whenValidUserAndInvalidTrainingTypeProvided() throws Exception {
         String jsonInput = "{\"notAName\":\"testType3\"}";
         BufferedReader reader = new BufferedReader(new StringReader(jsonInput));
@@ -123,6 +128,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Getting all training types")
     void TrainingTypeServlet_shouldReturnTrainingType() throws Exception {
         StringWriter out = new StringWriter();
         PrintWriter writer = new PrintWriter(out);
@@ -137,6 +143,7 @@ public class TrainingTypeServletTest {
     }
 
     @Test
+    @DisplayName("Not getting all training types (database is down)")
     void TrainingTypeServlet_shouldNotReturnTrainingType_whenDatabaseIsDown() {
         container.stop();
         trainingTypeServlet.init();

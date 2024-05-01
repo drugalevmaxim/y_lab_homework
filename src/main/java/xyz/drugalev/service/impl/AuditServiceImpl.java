@@ -7,7 +7,6 @@ import xyz.drugalev.entity.User;
 import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.mapper.AuditMapper;
 import xyz.drugalev.repository.AuditRepository;
-import xyz.drugalev.repository.impl.AuditRepositoryImpl;
 import xyz.drugalev.service.AuditService;
 
 import java.sql.SQLException;

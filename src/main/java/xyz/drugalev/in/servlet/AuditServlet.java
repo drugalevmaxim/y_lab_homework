@@ -1,4 +1,4 @@
-package xyz.drugalev.servlet;
+package xyz.drugalev.in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,6 +11,8 @@ import xyz.drugalev.dto.AuditDto;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.repository.impl.AuditRepositoryImpl;
+import xyz.drugalev.repository.impl.PrivilegeRepositoryImpl;
+import xyz.drugalev.repository.impl.RoleRepositoryImpl;
 import xyz.drugalev.repository.impl.UserRepositoryImpl;
 import xyz.drugalev.service.AuditService;
 import xyz.drugalev.service.impl.AuditServiceImpl;
@@ -26,7 +28,10 @@ public class AuditServlet extends HttpServlet {
 
     @Override
     public void init() {
-        auditService = new AuditServiceImpl(new AuditRepositoryImpl(new UserRepositoryImpl()));
+        auditService = new AuditServiceImpl(new AuditRepositoryImpl(new UserRepositoryImpl(
+                new RoleRepositoryImpl(
+                        new PrivilegeRepositoryImpl()
+                ))));
         this.objectMapper = JsonMapper.builder()
                 .findAndAddModules()
                 .build();
@@ -34,7 +39,7 @@ public class AuditServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             User user = (User) req.getSession().getAttribute("user");
             List<AuditDto> trainings = auditService.findAll(user);

@@ -11,7 +11,12 @@ import xyz.drugalev.repository.TrainingRepository;
 import xyz.drugalev.repository.TrainingTypeRepository;
 import xyz.drugalev.repository.UserRepository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +36,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
     @Override
     public List<Training> findAll() throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.trainings;";
+        String query = "SELECT * FROM ylab_trainings.trainings ORDER BY date DESC;";
         List<Training> trainings = new ArrayList<>();
         try (Connection connection = JDBCConnection.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -47,7 +52,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
     @Override
     public Optional<Training> find(long id) throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.trainings WHERE id = ?;";
+        String query = "SELECT * FROM ylab_trainings.trainings WHERE id = ? ORDER BY date DESC;";
         try (Connection connection = JDBCConnection.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setLong(1, id);
@@ -60,7 +65,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
     @Override
     public List<Training> findAllByUser(User user) throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.trainings WHERE performer = ?;";
+        String query = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? ORDER BY date DESC;";
         List<Training> trainings = new ArrayList<>();
         try (Connection connection = JDBCConnection.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -77,7 +82,7 @@ public class TrainingRepositoryImpl implements TrainingRepository {
 
     @Override
     public List<Training> findByUserBetweenDates(User user, LocalDate start, LocalDate end) throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? and date between ? and ?;";
+        String query = "SELECT * FROM ylab_trainings.trainings WHERE performer = ? and date between ? and ? ORDER BY date DESC;";
         List<Training> trainings = new ArrayList<>();
         try (Connection connection = JDBCConnection.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(query)) {

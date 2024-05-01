@@ -15,10 +15,7 @@ public class TrainingDtoValidator {
         if (trainingDto.getDate() == null || trainingDto.getDate().isAfter(LocalDate.now())) {
             return false;
         }
-        if (trainingDto.getDuration() < 0  || trainingDto.getBurnedCalories() < 0) {
-            return false;
-        }
-        return true;
+        return trainingDto.getDuration() >= 0 && trainingDto.getBurnedCalories() >= 0;
     }
 
 }

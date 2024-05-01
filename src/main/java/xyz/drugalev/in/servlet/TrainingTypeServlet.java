@@ -1,9 +1,8 @@
-package xyz.drugalev.servlet;
+package xyz.drugalev.in.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +18,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-
 @WebServlet("/training_types")
 public class TrainingTypeServlet extends HttpServlet {
 
@@ -27,7 +25,7 @@ public class TrainingTypeServlet extends HttpServlet {
     ObjectMapper objectMapper;
 
     @Override
-    public void init(ServletConfig config) {
+    public void init() {
         trainingTypeService = new TrainingTypeServiceImpl(new TrainingTypeRepositoryImpl());
         this.objectMapper = JsonMapper.builder()
                 .findAndAddModules()
@@ -36,22 +34,23 @@ public class TrainingTypeServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         try {
             List<TrainingTypeDto> trainings = trainingTypeService.findAll();
             resp.getWriter().println(objectMapper.writeValueAsString(trainings));
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         try {
-            TrainingTypeDto trainingTypeDto =  objectMapper.readValue(req.getInputStream(), TrainingTypeDto.class);
+            TrainingTypeDto trainingTypeDto =  objectMapper.readValue(req.getReader(), TrainingTypeDto.class);
             User user = (User) req.getSession().getAttribute("user");
             trainingTypeService.save(user, trainingTypeDto);
-            resp.setStatus(HttpServletResponse.SC_ACCEPTED);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
         } catch (IOException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         } catch (SQLException e) {

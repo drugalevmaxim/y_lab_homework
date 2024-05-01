@@ -1,4 +1,4 @@
-package xyz.drugalev.servlet;
+package xyz.drugalev.in.servlet;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

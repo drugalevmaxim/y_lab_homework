@@ -7,6 +7,7 @@ import xyz.drugalev.aspect.annotation.LogExecSpeed;
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.entity.Training;
 import xyz.drugalev.entity.User;
+import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.exception.TrainingAlreadyExistsException;
 import xyz.drugalev.exception.TrainingNotFoundException;
 import xyz.drugalev.mapper.TrainingMapper;
@@ -29,9 +30,9 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Auditable(action = "findAll(user)")
-    public List<TrainingDto> findAll(User user) throws SQLException {
-        if (user.hasPrivilege("OTHER_USERS_TRAININGS")) {
-            throw new TrainingNotFoundException();
+    public List<TrainingDto> findAll(User user) throws SQLException, AccessDeniedException {
+        if (!user.hasPrivilege("OTHER_USERS_TRAININGS")) {
+            throw new AccessDeniedException();
         }
         return trainingMapper.toTrainingDtos(trainingRepository.findAll());
     }
@@ -39,12 +40,10 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     @Auditable(action = "find specified training by id")
     @LogExecSpeed
-    public TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException {
+    public TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException, AccessDeniedException {
         Training training = trainingRepository.find(id).orElseThrow(TrainingNotFoundException::new);
-        System.out.println(555);
-        if (training.getPerformer().getId() != user.getId() || !user.hasPrivilege("OTHER_USERS_TRAININGS")) {
-            System.out.println(666);
-            throw new TrainingNotFoundException();
+        if (training.getPerformer().getId() != user.getId() && !user.hasPrivilege("OTHER_USERS_TRAININGS")) {
+            throw new AccessDeniedException();
         }
         return trainingMapper.toTrainingDto(training);
     }
@@ -74,7 +73,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Auditable(action = "update training for a user")
-    public void update(User user, TrainingDto training) throws SQLException {
+    public void update(User user, TrainingDto training) throws SQLException, TrainingNotFoundException {
         if (trainingRepository.find(training.getId()).orElseThrow(TrainingNotFoundException::new).getPerformer().getId() != user.getId()) {
             throw new TrainingNotFoundException();
         }
@@ -84,7 +83,7 @@ public class TrainingServiceImpl implements TrainingService {
 
     @Override
     @Auditable(action = "delete training for a user")
-    public void delete(User user, TrainingDto training) throws SQLException {
+    public void delete(User user, TrainingDto training) throws SQLException, TrainingNotFoundException {
         if (trainingRepository.find(training.getId()).orElseThrow(TrainingNotFoundException::new).getPerformer().getId() != user.getId()) {
             throw new TrainingNotFoundException();
         }

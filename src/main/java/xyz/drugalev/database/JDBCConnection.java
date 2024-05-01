@@ -10,9 +10,10 @@ import java.util.ResourceBundle;
  */
 public class JDBCConnection {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle("database/credentials");
-    private static final String URL = RESOURCE_BUNDLE.getString("db_url");
-    private static final String DB_USER = RESOURCE_BUNDLE.getString("db_user");
-    private static final String DB_PASS = RESOURCE_BUNDLE.getString("db_pass");
+    private static String dbUrl = RESOURCE_BUNDLE.getString("db_url");
+    private static String dbUser = RESOURCE_BUNDLE.getString("db_user");
+    private static String dbPass = RESOURCE_BUNDLE.getString("db_pass");
+
     /**
      * Get a connection to the PostgreSQL database.
      *
@@ -25,6 +26,12 @@ public class JDBCConnection {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        return DriverManager.getConnection(URL, DB_USER, DB_PASS);
+        return DriverManager.getConnection(dbUrl, dbUser, dbPass);
+    }
+
+    public static void setConnectionCredentials(String newDbUrl, String newDbUser, String newDbPass) {
+        dbUrl = newDbUrl;
+        dbUser = newDbUser;
+        dbPass = newDbPass;
     }
 }

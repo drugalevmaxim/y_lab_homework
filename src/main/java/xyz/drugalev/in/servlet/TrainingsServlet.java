@@ -1,5 +1,6 @@
-package xyz.drugalev.servlet;
+package xyz.drugalev.in.servlet;
 
+import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -9,12 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.entity.User;
-import xyz.drugalev.exception.TrainingAlreadyExistsException;
+import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.exception.TrainingNotFoundException;
-import xyz.drugalev.repository.impl.TrainingDataRepositoryImpl;
-import xyz.drugalev.repository.impl.TrainingRepositoryImpl;
-import xyz.drugalev.repository.impl.TrainingTypeRepositoryImpl;
-import xyz.drugalev.repository.impl.UserRepositoryImpl;
+import xyz.drugalev.repository.impl.*;
 import xyz.drugalev.service.TrainingService;
 import xyz.drugalev.service.impl.TrainingServiceImpl;
 import xyz.drugalev.validator.TrainingDtoValidator;
@@ -37,7 +35,10 @@ public class TrainingsServlet extends HttpServlet {
         this.trainingService = new TrainingServiceImpl(new TrainingRepositoryImpl(
                 new TrainingTypeRepositoryImpl(),
                 new TrainingDataRepositoryImpl(),
-                new UserRepositoryImpl()));
+                new UserRepositoryImpl(
+                        new RoleRepositoryImpl(
+                                new PrivilegeRepositoryImpl()
+                        ))));
         this.objectMapper = JsonMapper.builder()
                 .findAndAddModules()
                 .build();
@@ -45,7 +46,7 @@ public class TrainingsServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         String requestURI = req.getRequestURI().substring(req.getContextPath().length());
         final String regex = "^/trainings/([0-9]+)/?$";
         final Pattern pattern = Pattern.compile(regex);
@@ -53,6 +54,10 @@ public class TrainingsServlet extends HttpServlet {
         if (matcher.matches()) {
             long id = Long.parseLong(matcher.group(1));
             handleGetSpecific(req, resp, id);
+            return;
+        }
+        if (req.getRequestURI().endsWith("/trainings/all")) {
+            handleGetAll(req, resp);
             return;
         }
         if (!req.getRequestURI().endsWith("/trainings")) {
@@ -65,26 +70,45 @@ public class TrainingsServlet extends HttpServlet {
             return;
         }
 
-        handleGetAll(req, resp);
+        handleGetUsersAll(req, resp);
     }
+
     private void handleGetSpecific(HttpServletRequest req, HttpServletResponse resp, long id) {
         try {
             User user = (User) req.getSession().getAttribute("user");
             TrainingDto training = trainingService.find(user, id);
+            resp.setContentType("application/json");
             resp.getWriter().println(objectMapper.writeValueAsString(training));
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (TrainingNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
-    private void handleGetAll(HttpServletRequest req, HttpServletResponse resp) {
+    private void handleGetUsersAll(HttpServletRequest req, HttpServletResponse resp) {
         try {
             List<TrainingDto> trainings = trainingService.findAllByUser((User) req.getSession().getAttribute("user"));
+            resp.setContentType("application/json");
             resp.getWriter().println(objectMapper.writeValueAsString(trainings));
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+    private void handleGetAll(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            List<TrainingDto> trainings = trainingService.findAll((User) req.getSession().getAttribute("user"));
+            resp.setContentType("application/json");
+            resp.getWriter().println(objectMapper.writeValueAsString(trainings));
+            resp.setStatus(HttpServletResponse.SC_OK);
+        } catch (SQLException | IOException e) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        } catch (AccessDeniedException e) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
@@ -93,15 +117,18 @@ public class TrainingsServlet extends HttpServlet {
             LocalDate start = LocalDate.parse(req.getParameter("startDate"));
             LocalDate end = LocalDate.parse(req.getParameter("endDate"));
             List<TrainingDto> trainings = trainingService.findByUserBetweenDates((User) req.getSession().getAttribute("user"), start, end);
+            resp.setContentType("application/json");
             resp.getWriter().println(objectMapper.writeValueAsString(trainings));
+            resp.setStatus(HttpServletResponse.SC_OK);
         } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (DateTimeException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         if (!req.getRequestURI().endsWith("/trainings")) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -118,17 +145,15 @@ public class TrainingsServlet extends HttpServlet {
             User user = (User) req.getSession().getAttribute("user");
             trainingService.save(user, training);
             resp.setStatus(HttpServletResponse.SC_CREATED);
-        } catch (SQLException e) {
+        } catch (DatabindException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (TrainingAlreadyExistsException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        } catch (IOException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) {
         try {
             String requestURI = req.getRequestURI().substring(req.getContextPath().length());
             final String regex = "^/trainings/([0-9]+)/?$";
@@ -145,11 +170,13 @@ public class TrainingsServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (TrainingNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        } catch (AccessDeniedException e) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) {
+    public void doPut(HttpServletRequest req, HttpServletResponse resp) {
         try {
             String requestURI = req.getRequestURI().substring(req.getContextPath().length());
             final String regex = "^/trainings/([0-9]+)/?$";
@@ -171,12 +198,12 @@ public class TrainingsServlet extends HttpServlet {
             } else {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
-        } catch (SQLException e) {
+        } catch (DatabindException e) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        } catch (SQLException | IOException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } catch (TrainingNotFoundException e) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        } catch (IOException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 }

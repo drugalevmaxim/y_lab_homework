@@ -6,6 +6,7 @@ import xyz.drugalev.dto.AuditDto;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.mapper.AuditMapper;
+import xyz.drugalev.repository.AuditRepository;
 import xyz.drugalev.repository.impl.AuditRepositoryImpl;
 import xyz.drugalev.service.AuditService;
 
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class AuditServiceImpl implements AuditService {
-    private final AuditRepositoryImpl auditRepository;
+    private final AuditRepository auditRepository;
     private final AuditMapper auditMapper = Mappers.getMapper(AuditMapper.class);
 
     @Override

@@ -7,7 +7,11 @@ import xyz.drugalev.entity.User;
 import xyz.drugalev.repository.RoleRepository;
 import xyz.drugalev.repository.UserRepository;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
 
-    RoleRepository roleRepository = new RoleRepositoryImpl(new PrivilegeRepositoryImpl());
+    private final RoleRepository roleRepository;
 
     @Override
     public User save(User user) throws SQLException {

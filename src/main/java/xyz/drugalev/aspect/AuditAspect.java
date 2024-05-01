@@ -7,15 +7,21 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import xyz.drugalev.aspect.annotation.Auditable;
 import xyz.drugalev.entity.User;
+import xyz.drugalev.repository.AuditRepository;
 import xyz.drugalev.repository.impl.AuditRepositoryImpl;
+import xyz.drugalev.repository.impl.PrivilegeRepositoryImpl;
+import xyz.drugalev.repository.impl.RoleRepositoryImpl;
 import xyz.drugalev.repository.impl.UserRepositoryImpl;
 
 @Aspect
 public class AuditAspect {
-    private final AuditRepositoryImpl auditRepository;
+    private final AuditRepository auditRepository;
 
     public AuditAspect() {
-        this.auditRepository = new AuditRepositoryImpl(new UserRepositoryImpl());
+        this.auditRepository = new AuditRepositoryImpl(new UserRepositoryImpl(
+                new RoleRepositoryImpl(
+                        new PrivilegeRepositoryImpl()
+        )));
     }
 
     @Pointcut("@annotation(xyz.drugalev.aspect.annotation.Auditable)")

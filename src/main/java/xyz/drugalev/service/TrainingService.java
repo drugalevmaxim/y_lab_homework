@@ -2,6 +2,7 @@ package xyz.drugalev.service;
 
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.entity.User;
+import xyz.drugalev.exception.AccessDeniedException;
 import xyz.drugalev.exception.TrainingAlreadyExistsException;
 import xyz.drugalev.exception.TrainingNotFoundException;
 
@@ -21,7 +22,7 @@ public interface TrainingService {
      * @return a list of all training records
      * @throws SQLException if there is an error querying the database
      */
-    List<TrainingDto> findAll(User user) throws SQLException;
+    List<TrainingDto> findAll(User user) throws SQLException, AccessDeniedException;
 
     /**
      * Finds a training record by its ID for the given user.
@@ -32,7 +33,7 @@ public interface TrainingService {
      * @throws SQLException           if there is an error querying the database
      * @throws TrainingNotFoundException if the training record with the given ID does not exist for the given user
      */
-    TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException;
+    TrainingDto find(User user, long id) throws SQLException, TrainingNotFoundException, AccessDeniedException;
 
     /**
      * Finds all training records for the given user.
@@ -71,7 +72,7 @@ public interface TrainingService {
      * @param training the training record to update
      * @throws SQLException if there is an error updating the training record in the database
      */
-    void update(User user, TrainingDto training) throws SQLException;
+    void update(User user, TrainingDto training) throws SQLException, TrainingNotFoundException;
 
     /**
      * Deletes a training record for the given user.
@@ -80,5 +81,5 @@ public interface TrainingService {
      * @param training the training record to delete
      * @throws SQLException if there is an error deleting the training record from the database
      */
-    void delete(User user, TrainingDto training) throws SQLException;
+    void delete(User user, TrainingDto training) throws SQLException, TrainingNotFoundException;
 }

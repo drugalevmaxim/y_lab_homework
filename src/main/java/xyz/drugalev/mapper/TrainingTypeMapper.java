@@ -9,8 +9,8 @@ import java.util.List;
 
 @Mapper
 public interface TrainingTypeMapper {
-    TrainingTypeDto toTrainingTypeDto(String name);
     @Mapping(target = "id", ignore = true)
+    TrainingTypeDto toTrainingTypeDto(String name);
     TrainingType toTrainingType(TrainingTypeDto trainingTypeDto);
     List<TrainingTypeDto> toTrainingTypeDtos(List<TrainingType> trainingType);
 }

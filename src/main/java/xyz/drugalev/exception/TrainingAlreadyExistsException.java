@@ -1,8 +1,10 @@
 package xyz.drugalev.exception;
 
 /**
- * Exception thrown when a training is not found.
+ * Exception that is thrown when a training with the same name already exists.
  */
-public class TrainingAlreadyExistsException extends RuntimeException {
-    public TrainingAlreadyExistsException() {}
+public class TrainingAlreadyExistsException extends Exception {
+    public TrainingAlreadyExistsException(String message) {
+        super(message);
+    }
 }

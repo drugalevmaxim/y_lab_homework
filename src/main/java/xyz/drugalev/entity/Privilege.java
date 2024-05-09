@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Privilege {
-    private int id;
+    private long id;
     private String name;
 }

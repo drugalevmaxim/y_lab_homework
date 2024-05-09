@@ -15,8 +15,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Training {
-    private int id;
-    private User performer;
+    private long id;
+    private User user;
     private LocalDate date;
     private TrainingType trainingType;
     private final Set<TrainingData> trainingData  = new HashSet<>();

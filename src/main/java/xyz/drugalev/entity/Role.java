@@ -14,9 +14,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Role {
-    private int id;
+    private long id;
     private String name;
-    private final Set<Privilege> privileges = new HashSet<>();
+    private Set<Privilege> privileges = new HashSet<>();
 
     public boolean hasPermission(String privilege) {
         return this.privileges.stream().anyMatch(p -> p.getName().equals(privilege));

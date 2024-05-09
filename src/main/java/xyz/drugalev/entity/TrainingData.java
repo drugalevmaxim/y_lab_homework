@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TrainingData {
     private String name;
-    private int value;
+    private long value;
 }

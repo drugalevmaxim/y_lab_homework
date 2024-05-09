@@ -17,7 +17,7 @@ public class User {
     private long id;
     private String username;
     private String password;
-    private final Set<Role> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>();
 
     /**
      * Checks if user has given privilege.

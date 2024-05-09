@@ -4,14 +4,29 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 
+/**
+ * Aspect that logs the execution time of methods annotated with {@link xyz.drugalev.aspect.annotation.LogExecSpeed}.
+ */
 @Aspect
+@Component
 public class LoggingAspect {
 
+    /**
+     * Pointcut that matches methods annotated with {@link xyz.drugalev.aspect.annotation.LogExecSpeed}.
+     */
     @Pointcut("@annotation(xyz.drugalev.aspect.annotation.LogExecSpeed)")
     private void annotatedWithLogExecSpeed() {
     }
 
+    /**
+     * Advice that logs the execution time of methods annotated with {@link xyz.drugalev.aspect.annotation.LogExecSpeed}.
+     *
+     * @param joinPoint the join point
+     * @return the result of the method execution
+     * @throws Throwable if the method execution throws an exception
+     */
     @Around("annotatedWithLogExecSpeed()")
     public Object logExecution(ProceedingJoinPoint joinPoint) throws Throwable {
 

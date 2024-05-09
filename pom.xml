@@ -7,21 +7,28 @@
     <groupId>xyz.drugalev</groupId>
     <artifactId>ylab-training-diary</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <name>ylab-training-diary</name>
-
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <lombok.version>1.18.32</lombok.version>
-        <junit.version>5.10.2</junit.version>
+
+        <lombok.version>1.18.30</lombok.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <postgresql.version>42.7.3</postgresql.version>
+        <jakarta.version>6.0.0</jakarta.version>
         <liquibase.version>4.27.0</liquibase.version>
-        <maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
-        <jupiter.version>5.10.2</jupiter.version>
+        <jackson.version>2.17.0</jackson.version>
+        <aspectj.version>1.9.7</aspectj.version>
+        <slf4j.version>2.0.13</slf4j.version>
+
+        <junit.version>5.10.2</junit.version>
         <testcontainers.version>1.19.7</testcontainers.version>
+
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
     </properties>
 
     <dependencies>
@@ -29,12 +36,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -42,9 +48,45 @@
             <version>${postgresql.version}</version>
         </dependency>
         <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjtools</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${jupiter.version}</version>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -55,43 +97,99 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>postgresql</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <finalName>ylab-training-diary</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>${maven-shade-plugin.version}</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>aspectj-maven-plugin</artifactId>
+                <version>1.15.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjrt</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjweaver</artifactId>
+                        <version>${aspectj.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>process-classes</phase>
                         <goals>
-                            <goal>shade</goal>
+                            <goal>compile</goal>
                         </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>xyz.drugalev.Main</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <showWeaveInfo/>
+                    <forceAjcCompile>true</forceAjcCompile>
+                    <sources/>
+                    <weaveDirectories>
+                        <weaveDirectory>${project.build.directory}/classes</weaveDirectory>
+                    </weaveDirectories>
+                    <source>16</source>
+                    <target>16</target>
+                    <complianceLevel>16</complianceLevel>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

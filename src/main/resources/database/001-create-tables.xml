@@ -85,25 +85,28 @@
         </createTable>
         <addUniqueConstraint constraintName="unique_training_constant" tableName="trainings" columnNames="performer, date, training_type"/>
 
-        <createSequence sequenceName="training_data_id_seq"/>
         <createTable tableName="training_data">
-            <column name="id" type="BIGINT" defaultValueComputed="nextval('training_data_id_seq')">
-                <constraints primaryKey="true" nullable="false"/>
+            <column name="training" type="BIGINT">
+                <constraints  nullable="false" foreignKeyName="trainings_training_data_fkey" deleteCascade="true" references="trainings(id)"/>
             </column>
             <column name="name" type="varchar(255)">
-                <constraints unique="true" nullable="false"/>
+                <constraints nullable="false"/>
             </column>
             <column name="value" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>
+        <addUniqueConstraint constraintName="unique_training_data_constant" tableName="training_data" columnNames="training, name"/>
 
-        <createTable tableName="training_training_data">
-            <column name="training_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="training_training_data_training_id_fkey" deleteCascade="true" references="trainings(id)"/>
+        <createTable tableName="audit">
+            <column name="user" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="audit_user_fkey" deleteCascade="true" references="users(id)"/>
             </column>
-            <column name="training_data_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="training_training_data_training_data_id_fkey" deleteCascade="true" references="training_data(id)"/>
+            <column name="time" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="action" type="varchar(255)">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>

@@ -7,6 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -59,7 +60,11 @@ public class ExceptionApiHandler {
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex, WebRequest request) {
         List<String> details = new ArrayList<>();
         for (ObjectError error : ex.getBindingResult().getAllErrors()) {
-            details.add(error.getDefaultMessage());
+            if (error instanceof FieldError) {
+                details.add(((FieldError) error).getField() + " " + error.getDefaultMessage());
+            } else {
+                details.add(error.getDefaultMessage());
+            }
         }
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, details.toString());
         problemDetail.setInstance(URI.create(request.getContextPath()));
@@ -76,7 +81,7 @@ public class ExceptionApiHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ProblemDetail handleIntegrityViolation(Exception ex, WebRequest request) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Insufficient or invalid data provided");
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Insufficient or invalid data provided. Additional information: " + ex.getMessage());
         problemDetail.setInstance(URI.create(request.getContextPath()));
         return problemDetail;
     }

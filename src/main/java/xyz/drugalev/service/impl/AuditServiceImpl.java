@@ -1,7 +1,6 @@
 package xyz.drugalev.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
 import xyz.drugalev.dto.AuditDto;
 import xyz.drugalev.entity.User;
@@ -16,7 +15,7 @@ import java.util.List;
 @Service
 public class AuditServiceImpl implements AuditService {
     private final AuditRepository auditRepository;
-    private final AuditMapper auditMapper = Mappers.getMapper(AuditMapper.class);
+    private final AuditMapper auditMapper;
 
     @Override
     public List<AuditDto> findAll(User user) throws UserPrivilegeException {

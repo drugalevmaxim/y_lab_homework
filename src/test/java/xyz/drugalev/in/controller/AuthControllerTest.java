@@ -1,4 +1,4 @@
-package xyz.drugalev;
+package xyz.drugalev.in.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -16,8 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import xyz.drugalev.config.WebConfig;
-import xyz.drugalev.in.controller.AuthController;
-import xyz.drugalev.in.controller.ExceptionApiHandler;
 import xyz.drugalev.dto.UserDto;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.mapper.UserMapper;
@@ -80,7 +78,8 @@ public class AuthControllerTest {
         when(userRepository.findByName(userCredentials.getUsername())).thenReturn(Optional.of(user));
         when(jwtService.getJwtToken(user)).thenReturn(jwtToken);
 
-        MvcResult mvcResult = mockMvc.perform(post("/auth/login").content(objectMapper.writeValueAsString(userCredentials))
+        MvcResult mvcResult = mockMvc.perform(post("/auth/login")
+                        .content(objectMapper.writeValueAsString(userCredentials))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();

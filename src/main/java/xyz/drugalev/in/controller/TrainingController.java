@@ -37,9 +37,9 @@ public class TrainingController {
     @GetMapping
     public List<TrainingDto> getUserTrainings(@RequestAttribute("user") User user,
                                               @Parameter(description = "The start date of the training.")
-                                              @RequestParam(value = "start", required = false) String start,
+                                              @RequestParam(value = "startDate", required = false) String start,
                                               @Parameter(description = "The end date of the training.")
-                                              @RequestParam(value = "end", required = false) String end) throws DateTimeParseException {
+                                              @RequestParam(value = "endDate", required = false) String end) throws DateTimeParseException {
         if (start != null && end != null) {
             return trainingService.findByUserBetweenDates(user, LocalDate.parse(start), LocalDate.parse(end));
         }

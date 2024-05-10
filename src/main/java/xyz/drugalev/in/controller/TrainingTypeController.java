@@ -19,7 +19,7 @@ import xyz.drugalev.service.TrainingTypeService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/trainingType")
+@RequestMapping(value = "/training-types")
 @SecurityRequirement(name = "bearerAuth")
 @RequiredArgsConstructor
 public class TrainingTypeController {

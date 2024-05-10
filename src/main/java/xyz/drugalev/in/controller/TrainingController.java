@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.drugalev.aspect.annotation.LogExecSpeed;
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.exception.TrainingAlreadyExistsException;
@@ -56,7 +55,6 @@ public class TrainingController {
      */
     @Operation(summary = "Get all trainings", description = "Gets all trainings.")
     @GetMapping("/all")
-    @LogExecSpeed
     public List<TrainingDto> getAllTrainings(@RequestAttribute("user") User user) throws AccessDeniedException {
         return trainingService.findAll(user);
     }

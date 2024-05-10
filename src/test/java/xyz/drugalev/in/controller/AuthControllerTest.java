@@ -36,6 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final UserDto userCredentials = new UserDto("admin", "admin");
+    private final User user = new User(1, "admin", "admin", new HashSet<>());
+    private final JwtToken jwtToken = new JwtToken("token");
     private MockMvc mockMvc;
     @InjectMocks
     private AuthServiceImpl authServiceImpl;
@@ -45,9 +48,6 @@ public class AuthControllerTest {
     private JwtService jwtService;
     @Mock
     private UserMapper userMapper;
-    private final UserDto userCredentials = new UserDto("admin", "admin");
-    private final User user = new User(1, "admin", "admin", new HashSet<>());
-    private final JwtToken jwtToken = new JwtToken("token");
 
     @BeforeEach
     public void setUp() {
@@ -87,5 +87,4 @@ public class AuthControllerTest {
         String result = mvcResult.getResponse().getContentAsString();
         Assertions.assertEquals("{\"token\":\"token\"}", result);
     }
-
 }

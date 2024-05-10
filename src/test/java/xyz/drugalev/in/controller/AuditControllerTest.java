@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -61,6 +62,7 @@ class AuditControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get audit log")
     void audit() {
         when(auditServiceImpl.findAll(user)).thenReturn(List.of(auditDto));
         MvcResult mvcResult = mockMvc.perform(get("/audit").requestAttr("user", user))

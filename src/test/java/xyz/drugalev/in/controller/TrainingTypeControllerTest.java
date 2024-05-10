@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,6 +59,7 @@ class TrainingTypeControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get all training types")
     void getAll() {
         when(trainingTypeService.getAll()).thenReturn(List.of(trainingTypeDto));
         MvcResult mvcResult = mockMvc.perform(get("/training-types").requestAttr("user", user))
@@ -69,6 +71,7 @@ class TrainingTypeControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully create training type")
     void create() {
         when(trainingTypeService.save(user, trainingTypeDto)).thenReturn(trainingTypeDto);
         MvcResult mvcResult = mockMvc.perform(post("/training-types").requestAttr("user", user)

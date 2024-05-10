@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -64,6 +65,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get all users trainings")
     public void testGetAllUser() {
         when(trainingServiceImpl.findAllByUser(user)).thenReturn(List.of(trainingDto));
         MvcResult mvcResult = mockMvc.perform(get("/trainings").requestAttr("user", user))
@@ -75,6 +77,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get all trainings")
     public void testGetAll() {
         when(trainingServiceImpl.findAllByUser(user)).thenReturn(List.of(trainingDto));
         MvcResult mvcResult = mockMvc.perform(get("/trainings/all").requestAttr("user", user))
@@ -86,6 +89,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get all users trainings between dates")
     public void testGetAllBetweenDates() {
         when(trainingServiceImpl.findByUserBetweenDates(user, LocalDate.parse("2023-01-01"), LocalDate.parse("2023-01-31"))).thenReturn(List.of(trainingDto));
         MvcResult mvcResult = mockMvc.perform(get("/trainings").requestAttr("user", user)
@@ -99,6 +103,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully get id-specified user training")
     public void testGetSpecified() {
         when(trainingRepository.find(anyLong())).thenReturn(Optional.of(training));
         when(trainingServiceImpl.find(user, anyLong())).thenReturn(trainingDto);
@@ -111,6 +116,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully create users training")
     public void testCreate() {
         when(trainingMapper.toTraining(any())).thenReturn(training);
         when(trainingServiceImpl.save(user, any(TrainingDto.class))).thenReturn(trainingDto);
@@ -126,6 +132,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully update users training")
     public void testUpdate() {
         when(trainingRepository.find(anyLong())).thenReturn(Optional.of(training));
         when(trainingMapper.toTraining(any())).thenReturn(training);
@@ -142,6 +149,7 @@ public class TrainingControllerTest {
 
     @Test
     @SneakyThrows
+    @DisplayName("Successfully delete users training")
     public void testDelete() {
         when(trainingRepository.find(anyLong())).thenReturn(Optional.of(training));
         mockMvc.perform(delete("/trainings/1").requestAttr("user", user))

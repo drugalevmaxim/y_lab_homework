@@ -20,7 +20,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import xyz.drugalev.config.WebConfig;
 import xyz.drugalev.dto.TrainingDto;
 import xyz.drugalev.dto.TrainingTypeDto;
-import xyz.drugalev.entity.*;
+import xyz.drugalev.entity.Privilege;
+import xyz.drugalev.entity.Role;
+import xyz.drugalev.entity.Training;
+import xyz.drugalev.entity.TrainingType;
+import xyz.drugalev.entity.User;
 import xyz.drugalev.mapper.TrainingMapper;
 import xyz.drugalev.repository.TrainingRepository;
 import xyz.drugalev.service.impl.TrainingServiceImpl;
@@ -33,7 +37,10 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringJUnitWebConfig(WebConfig.class)

@@ -1,0 +1,164 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Drugalev Maxim
+      changes:
+        - createSequence:
+            sequenceName: seq_role
+        - createTable:
+            tableName: role
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValue: NEXTVAL('seq_role')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - createSequence:
+            sequenceName: seq_person
+        - createTable:
+            tableName: person
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValue: NEXTVAL('seq_person')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: varchar(64)
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: password
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_person_role
+                    references: role(id)
+        - createSequence:
+            sequenceName: seq_training_type
+        - createTable:
+            tableName: training_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValue: NEXTVAL('seq_training_type')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    unique: true
+                    nullable: false
+        - createSequence:
+            sequenceName: seq_training
+        - createTable:
+            tableName: training
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  defaultValue: NEXTVAL('seq_training')
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: person_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_training_person
+                    references: person(id)
+              - column:
+                  name: training_date
+                  type: date
+                  constraints:
+                    nullable: false
+              - column:
+                  name: training_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_training_training_type
+                    references: training_type(id)
+              - column:
+                  name: duration
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: burned_calories
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: training
+            columnNames: person_id, training_date, training_type_id
+        - createTable:
+            tableName: training_data
+            columns:
+              - column:
+                  name: training_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: value
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_training_data_training
+            baseTableName: training_data
+            baseColumnNames: training_id
+            referencedTableName: training
+            referencedColumnNames:  id
+            onDelete: CASCADE
+        - addUniqueConstraint:
+            tableName: training_data
+            columnNames: training_id, name
+        - createTable:
+            tableName: audit
+            columns:
+              - column:
+                  name: person_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_audit_person
+                    references: person(id)
+              - column:
+                  name: action
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_time
+                  type: timestamp
+                  defaultValue: NOW()
+                  constraints:
+                    nullable: false

@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Drugalev Maxim
+      changes:
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: 'user'
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: name
+                  value: 'admin'
+        - insert:
+            tableName: person
+            columns:
+              - column:
+                  name: username
+                  value: 'default_admin'
+              - column:
+                  name: password
+                  value: 'default_admin'
+              - column:
+                  name: role_id
+                  value: 2
+        - insert:
+            tableName: person
+            columns:
+              - column:
+                  name: username
+                  value: 'default_user'
+              - column:
+                  name: password
+                  value: 'default_user'
+              - column:
+                  name: role_id
+                  value: 1

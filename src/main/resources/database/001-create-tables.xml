@@ -67,8 +67,8 @@
             <column name="id" type="BIGINT" defaultValueComputed="nextval('trainings_id_seq')">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="performer" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="trainings_performer_fkey" deleteCascade="true" references="users(id)"/>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="trainings_user_id_fkey" deleteCascade="true" references="users(id)"/>
             </column>
             <column name="date" type="date">
                 <constraints nullable="false"/>
@@ -83,7 +83,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <addUniqueConstraint constraintName="unique_training_constant" tableName="trainings" columnNames="performer, date, training_type"/>
+        <addUniqueConstraint constraintName="unique_training_constant" tableName="trainings" columnNames="user_id, date, training_type"/>
 
         <createTable tableName="training_data">
             <column name="training" type="BIGINT">

@@ -2,28 +2,29 @@ package xyz.drugalev.service;
 
 import xyz.drugalev.dto.TrainingTypeDto;
 import xyz.drugalev.entity.User;
-import xyz.drugalev.exception.AccessDeniedException;
+import xyz.drugalev.exception.TrainingTypeAlreadyExistsException;
+import xyz.drugalev.exception.UserPrivilegeException;
 
-import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Interface for working with training types.
+ */
 public interface TrainingTypeService {
-
-    /**
-     * Saves a new training type.
-     *
-     * @param user            the user who is saving the training type
-     * @param trainingTypeDto the training type to save
-     * @throws SQLException           if there is an error saving the training type to the database
-     * @throws AccessDeniedException if the user does not have permission to save the training type
-     */
-    void save(User user, TrainingTypeDto trainingTypeDto) throws SQLException, AccessDeniedException;
-
     /**
      * Finds all training types.
      *
      * @return a list of all training types
-     * @throws SQLException if there is an error retrieving the training types from the database
      */
-    List<TrainingTypeDto> findAll() throws SQLException;
+    List<TrainingTypeDto> getAll();
+
+    /**
+     * Saves a new training type.
+     *
+     * @param user         the user who is saving the training type
+     * @param trainingType the training type to save
+     * @throws UserPrivilegeException             if the user does not have permission to save the training type
+     * @throws TrainingTypeAlreadyExistsException if training type already exists
+     */
+    TrainingTypeDto save(User user, TrainingTypeDto trainingType) throws UserPrivilegeException, TrainingTypeAlreadyExistsException;
 }

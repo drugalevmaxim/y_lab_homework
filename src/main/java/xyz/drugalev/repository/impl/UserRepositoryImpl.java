@@ -1,106 +1,73 @@
 package xyz.drugalev.repository.impl;
 
-import lombok.RequiredArgsConstructor;
-import xyz.drugalev.database.JDBCConnection;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.stereotype.Repository;
+import xyz.drugalev.entity.Privilege;
 import xyz.drugalev.entity.Role;
 import xyz.drugalev.entity.User;
-import xyz.drugalev.repository.RoleRepository;
 import xyz.drugalev.repository.UserRepository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+import javax.sql.DataSource;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * The User repository implementation.
- *
- * @author Drugalev Maxim
- */
-@RequiredArgsConstructor
+@Repository
 public class UserRepositoryImpl implements UserRepository {
+    final JdbcTemplate jdbcTemplate;
 
-    private final RoleRepository roleRepository;
+    public UserRepositoryImpl(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
 
     @Override
-    public User save(User user) throws SQLException {
-        String query = "INSERT INTO ylab_trainings.users (username, password) VALUES (?, ?) RETURNING id;";
-        User savedUser;
-        try (Connection connection = JDBCConnection.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-                statement.setString(1, user.getUsername());
-                statement.setString(2, user.getPassword());
-
-                statement.executeUpdate();
-
-                try (ResultSet rs = statement.getGeneratedKeys()) {
-                    rs.next();
-
-                    savedUser = new User(rs.getLong(1), user.getUsername(), user.getPassword());
-                    savedUser.setId(rs.getLong(1));
-                    savedUser.setUsername(user.getUsername());
-                    savedUser.setPassword(user.getPassword());
-
-                    return savedUser;
-                }
+    public Optional<User> findById(long id) {
+        try {
+            User user = jdbcTemplate.queryForObject("SELECT * from ylab_trainings.users where id = ?;", new BeanPropertyRowMapper<>(User.class), id);
+            if (user == null) {
+                return Optional.empty();
             }
+            return Optional.of(mapUserRoles(user));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
     }
 
     @Override
-    public Optional<User> find(String username) throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.users WHERE username = ?;";
-        try (Connection connection = JDBCConnection.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setString(1, username);
-                try (ResultSet rs = statement.executeQuery()) {
-                    return mapUser(rs);
-                }
-            }
-        }
+    public User save(User user) {
+        SimpleJdbcInsert insert = new SimpleJdbcInsert(jdbcTemplate)
+                .withSchemaName("ylab_trainings")
+                .withTableName("users")
+                .usingGeneratedKeyColumns("id");
+        SqlParameterSource parameters = new BeanPropertySqlParameterSource(user);
+        return findById(insert.executeAndReturnKey(parameters).longValue()).orElseThrow();
     }
 
     @Override
-    public Optional<User> find(int id) throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.users WHERE id = ?;";
-        try (Connection connection = JDBCConnection.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                statement.setLong(1, id);
-                try (ResultSet rs = statement.executeQuery()) {
-                    return mapUser(rs);
-                }
+    public Optional<User> findByName(String name) {
+        try {
+            User user = jdbcTemplate.queryForObject("SELECT * from ylab_trainings.users where username = ?;", new BeanPropertyRowMapper<>(User.class), name);
+            if (user == null) {
+                return Optional.empty();
             }
+            return Optional.of(mapUserRoles(user));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
         }
     }
 
-    @Override
-    public List<User> findAll() throws SQLException {
-        String query = "SELECT * FROM ylab_trainings.users;";
-        List<User> users = new ArrayList<>();
-        try (Connection connection = JDBCConnection.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(query)) {
-                try (ResultSet rs = statement.executeQuery()) {
-                    for (Optional<User> user = mapUser(rs); user.isPresent(); user = mapUser(rs)) {
-                        users.add(user.get());
-                    }
-                    return users;
-                }
-            }
+    private User mapUserRoles(User user) {
+        List<Role> roles = jdbcTemplate.query("SELECT * from ylab_trainings.roles where id in (SELECT role_id from ylab_trainings.user_roles where user_id = ?);", new BeanPropertyRowMapper<>(Role.class), user.getId());
+        for (Role role : roles) {
+            List<Privilege> privileges = jdbcTemplate.query("SELECT * from ylab_trainings.privileges where id in (SELECT privilege_id from ylab_trainings.role_privileges where role_id = ?);", new BeanPropertyRowMapper<>(Privilege.class), role.getId());
+            role.setPrivileges(new HashSet<>(privileges));
         }
-    }
-
-    private Optional<User> mapUser(ResultSet rsUser) throws SQLException {
-        if (rsUser.next()) {
-            User user = new User(rsUser.getInt("id"), rsUser.getString("username"), rsUser.getString("password"));
-            for (Role userRole : roleRepository.findUserRoles(user.getId())) {
-                user.getRoles().add(userRole);
-            }
-            return Optional.of(user);
-        }
-        return Optional.empty();
+        user.setRoles(new HashSet<>(roles));
+        return user;
     }
 }

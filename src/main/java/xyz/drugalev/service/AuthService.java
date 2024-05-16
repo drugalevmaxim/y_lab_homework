@@ -1,31 +1,29 @@
 package xyz.drugalev.service;
 
-import xyz.drugalev.entity.User;
-import xyz.drugalev.exception.InvalidParametersException;
+import xyz.drugalev.util.JwtToken;
+import xyz.drugalev.dto.UserDto;
 import xyz.drugalev.exception.UserAlreadyExistsException;
-import xyz.drugalev.exception.UserNotFoundException;
-
-import java.sql.SQLException;
+import xyz.drugalev.exception.UserDoesNotExistsException;
 
 /**
- * Interface for authentication service.
+ * Service for authentication and registration of users.
  */
 public interface AuthService {
     /**
-     * Logs in the user with the specified username and password.
+     * Login user and return JWT token.
      *
-     * @param username the username of the user to log in
-     * @param password the password of the user to log in
-     * @return the logged-in user
+     * @param user user to login
+     * @return JWT token
+     * @throws UserDoesNotExistsException if user does not exist
      */
-    User login(String username, String password) throws UserNotFoundException, SQLException;
+    JwtToken login(UserDto user) throws UserDoesNotExistsException;
 
     /**
-     * Registers a new user with the specified username and password.
+     * Register user and return JWT token.
      *
-     * @param username the username of the new user
-     * @param password the password of the new user
-     * @return the registered user
+     * @param user user to register
+     * @return JWT token
+     * @throws UserAlreadyExistsException if user already exists
      */
-    User register(String username, String password) throws UserAlreadyExistsException, SQLException, InvalidParametersException;
+    JwtToken register(UserDto user) throws UserAlreadyExistsException;
 }

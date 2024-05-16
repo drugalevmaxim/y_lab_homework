@@ -1,19 +1,22 @@
 package xyz.drugalev.dto;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * Data transfer object for users.
+ * Data transfer object for user.
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class    UserDto {
+    @NotNull
+    @Size(min=2, max=32, message = "Username must contain at least 2 characters and no more than 32")
     private String username;
-    private final Set<String> roles= new HashSet<>();
+    @NotNull
+    @Size(min = 6, max = 64, message = "Password must contain at least 6 characters and no more than 64")
+    private String password;
 }

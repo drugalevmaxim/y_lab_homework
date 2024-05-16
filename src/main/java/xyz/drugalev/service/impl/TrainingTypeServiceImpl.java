@@ -1,35 +1,36 @@
 package xyz.drugalev.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.mapstruct.factory.Mappers;
-import xyz.drugalev.aspect.annotation.Auditable;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.stereotype.Service;
 import xyz.drugalev.dto.TrainingTypeDto;
 import xyz.drugalev.entity.User;
-import xyz.drugalev.exception.AccessDeniedException;
+import xyz.drugalev.exception.TrainingTypeAlreadyExistsException;
+import xyz.drugalev.exception.UserPrivilegeException;
 import xyz.drugalev.mapper.TrainingTypeMapper;
 import xyz.drugalev.repository.TrainingTypeRepository;
 import xyz.drugalev.service.TrainingTypeService;
 
-import java.sql.SQLException;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class TrainingTypeServiceImpl implements TrainingTypeService {
     private final TrainingTypeRepository trainingTypeRepository;
-    private final TrainingTypeMapper trainingTypeMapper = Mappers.getMapper(TrainingTypeMapper.class);
-
+    private final TrainingTypeMapper trainingTypeMapper;
     @Override
-    @Auditable(action = "add training type")
-    public void save(User user, TrainingTypeDto trainingTypeDto) throws SQLException, AccessDeniedException {
-        if (!user.hasPrivilege("ADD_TRAINING_TYPE")) {
-            throw new AccessDeniedException();
-        }
-        trainingTypeRepository.save(trainingTypeDto.getName());
+    public List<TrainingTypeDto> getAll() {
+        return trainingTypeMapper.toTrainingTypeDtos(trainingTypeRepository.findAll());
     }
 
     @Override
-    @Auditable(action = "find all training types")
-    public List<TrainingTypeDto> findAll() throws SQLException {
-        return trainingTypeMapper.toTrainingTypeDtos(trainingTypeRepository.findAll());
+    public TrainingTypeDto save(User user, TrainingTypeDto trainingType) throws UserPrivilegeException, TrainingTypeAlreadyExistsException {
+        if (!user.hasPrivilege("ADD_TRAINING_TYPE")) {
+            throw new UserPrivilegeException("User does not have privilege to add training type");
+        } try {
+            return trainingTypeMapper.toTrainingTypeDto(trainingTypeRepository.save(trainingTypeMapper.toTrainingType(trainingType)));
+        } catch (DuplicateKeyException e) {
+            throw new TrainingTypeAlreadyExistsException("Training type \"%s\" already exists".formatted(trainingType.getName()));
+        }
     }
 }

@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: ylab-training-app
+    jwtTokenSecret: "drugalevmaxim"
+    jwtTokenExpire: 86400
+  datasource:
+    platform: postgres
+    username: ylab_drugalev
+    password: drugalev
+    driverClassName: org.postgresql.Driver
+    schema: ylab_trainings
+    url: jdbc:postgresql://localhost:5432/ylab_drugalev

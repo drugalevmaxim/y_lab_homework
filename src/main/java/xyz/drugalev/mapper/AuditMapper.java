@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Mapper for converting between {@link Audit} and {@link AuditDto}.
  */
-@Mapper
+@Mapper(componentModel = "spring")
 public interface AuditMapper {
 
     /**

@@ -1,33 +1,40 @@
 package xyz.drugalev.aspect;
 
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import xyz.drugalev.aspect.annotation.Auditable;
+import org.springframework.stereotype.Component;
 import xyz.drugalev.entity.User;
 import xyz.drugalev.repository.AuditRepository;
-import xyz.drugalev.repository.impl.AuditRepositoryImpl;
-import xyz.drugalev.repository.impl.PrivilegeRepositoryImpl;
-import xyz.drugalev.repository.impl.RoleRepositoryImpl;
-import xyz.drugalev.repository.impl.UserRepositoryImpl;
 
+/**
+ * Aspect that logs the execution of methods annotated with {@link org.springframework.web.bind.annotation.RestController}.
+ * For each execution, it saves the user who made the request to the audit repository.
+ */
 @Aspect
+@Component
+@RequiredArgsConstructor
 public class AuditAspect {
     private final AuditRepository auditRepository;
 
-    public AuditAspect() {
-        this.auditRepository = new AuditRepositoryImpl(new UserRepositoryImpl(
-                new RoleRepositoryImpl(
-                        new PrivilegeRepositoryImpl()
-        )));
-    }
-
-    @Pointcut("@annotation(xyz.drugalev.aspect.annotation.Auditable)")
+    /**
+     * Pointcut that matches methods annotated with {@link org.springframework.web.bind.annotation.RestController}.
+     */
+    @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
     private void annotatedWithAuditable() {
     }
 
+    /**
+     * Advice that logs the execution of methods annotated with {@link org.springframework.web.bind.annotation.RestController}.
+     * For each execution, it saves the user who made the request to the audit repository.
+     *
+     * @param joinPoint the join point
+     * @return the result of the method execution
+     * @throws Throwable if the method execution throws an exception
+     */
     @Around("annotatedWithAuditable()")
     public Object logExecution(ProceedingJoinPoint joinPoint) throws Throwable {
 
@@ -36,7 +43,7 @@ public class AuditAspect {
 
         for (Object arg : joinPoint.getArgs()) {
             if (arg instanceof User user) {
-                auditRepository.save(user, signature.getMethod().getAnnotation(Auditable.class).action());
+                auditRepository.save(user, signature.getMethod().getName());
                 break;
             }
         }

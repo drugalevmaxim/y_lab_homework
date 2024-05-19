@@ -6,6 +6,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Bean;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
+import xyz.drugalev.ylabauditspringbootstarter.annotation.EnableAudit;
 
 /**
  * Test configuration for YlabTrainingAppApplication.
@@ -13,6 +14,7 @@ import org.testcontainers.utility.DockerImageName;
  * @author Drugalev Maxim
  */
 @TestConfiguration(proxyBeanMethods = false)
+@EnableAudit
 public class TestYlabTrainingAppApplicationConfiguration {
 
     @Bean

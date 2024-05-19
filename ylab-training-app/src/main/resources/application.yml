@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ylab-spring-boot
+    jwtTokenSecret: drugalev
+    jwtTokenExpire: 604_800_000
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ylab_drugalev
+    username: ylab_drugalev
+    password: drugalev
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      schema: ylab_training
+  liquibase:
+    change-log: database/changelog.yml
+    default-schema: ylab_training
+    liquibase-schema: ylab_service
+server:
+  error:
+    whitelabel:
+      enabled: false
+    include-binding-errors: always
+    include-message: always
+    include-stacktrace: never
+    include-exception: false

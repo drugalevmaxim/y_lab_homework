@@ -58,4 +58,5 @@ Documentation can be accessed via Swagger UI at ```.../swagger-ui/index.html```
 1. [Task 1](../../pull/1/)
 2. [Task 2](../../pull/2/)
 3. [Task 3](../../pull/3/)
-4. [Task 3](../../pull/4/)
+4. [Task 4](../../pull/4/)
+5. [Task 5](../../pull/5/)
